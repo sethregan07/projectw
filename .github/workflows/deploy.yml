@@ -1,0 +1,218 @@
+name: Deploy Microservices
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test --if-present
+
+      - name: Build application
+        run: npm run build
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and push API Gateway
+      - name: Extract API Gateway metadata
+        id: meta-gateway
+        run: |
+          echo "tags=gateway-${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "version=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push API Gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/microservices/api-gateway
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-gateway:${{ steps.meta-gateway.outputs.version }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-gateway:latest
+          labels: ${{ steps.meta-gateway.outputs.labels }}
+
+      # Build and push Auth Service
+      - name: Extract Auth Service metadata
+        id: meta-auth
+        run: |
+          echo "tags=auth-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Auth Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/microservices/auth-service
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/auth-service:${{ github.sha }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/auth-service:latest
+
+      # Build and push Ghost Service
+      - name: Extract Ghost metadata
+        id: meta-ghost
+        run: |
+          echo "tags=ghost-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Ghost Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/microservices/ghost-service
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/ghost-service:${{ github.sha }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/ghost-service:latest
+
+      # Build and push Mautic Service
+      - name: Extract Mautic metadata
+        id: meta-mautic
+        run: |
+          echo "tags=mautic-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Mautic Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/microservices/mautic-service
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/mautic-service:${{ github.sha }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/mautic-service:latest
+
+      # Build and push Database Service
+      - name: Extract Database metadata
+        id: meta-db
+        run: |
+          echo "tags=database-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Database Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/microservices/database-service
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/database-service:${{ github.sha }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/database-service:latest
+
+      # Build and push Frontend
+      - name: Extract Frontend metadata
+        id: meta-frontend
+        run: |
+          echo "tags=frontend-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ github.sha }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update docker-compose images
+        run: |
+          # Update docker-compose.yml with latest image tags
+          sed -i "s|ghcr.io/${{ github.repository }}/api-gateway:latest|ghcr.io/${{ github.repository }}/api-gateway:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+          sed -i "s|ghcr.io/${{ github.repository }}/auth-service:latest|ghcr.io/${{ github.repository }}/auth-service:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+          sed -i "s|ghcr.io/${{ github.repository }}/ghost-service:latest|ghcr.io/${{ github.repository }}/ghost-service:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+          sed -i "s|ghcr.io/${{ github.repository }}/mautic-service:latest|ghcr.io/${{ github.repository }}/mautic-service:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+          sed -i "s|ghcr.io/${{ github.repository }}/database-service:latest|ghcr.io/${{ github.repository }}/database-service:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+          sed -i "s|ghcr.io/${{ github.repository }}/frontend:latest|ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" backend/microservices/docker-compose.yml
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        run: |
+          # Copy updated docker-compose.yml to VPS
+          scp backend/microservices/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/new-platform/backend/microservices/
+
+          # Run deployment commands on VPS
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /opt/new-platform/backend/microservices
+            echo "Pulling latest images..."
+            docker-compose pull
+            echo "Recreating services..."
+            docker-compose up -d
+            echo "Waiting for services to be healthy..."
+            sleep 30
+            echo "Checking service status..."
+            docker-compose ps
+          EOF
+
+  backup-setup:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH for Backup Script
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Ensure Backup Scripts are on VPS
+        run: |
+          # Copy backup scripts to VPS
+          scp backend/microservices/database-service/backup-script.sh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/new-platform/scripts/
+          scp backend/scripts/vps_disaster_recovery.sh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/new-platform/scripts/
+
+      - name: Setup Cron Jobs for Backups
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            # Create backup directory
+            mkdir -p /opt/new-platform/backups
+
+            # Add backup cron job (daily at 2 AM)
+            (crontab -l 2>/dev/null; echo "0 2 * * * /opt/new-platform/scripts/backup-script.sh >> /var/log/backup.log 2>&1") | crontab -
+
+            # Ensure scripts are executable
+            chmod +x /opt/new-platform/scripts/backup-script.sh
+            chmod +x /opt/new-platform/scripts/vps_disaster_recovery.sh
+          EOF
+
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Clean up old images
+        run: |
+          # Keep last 10 images per service, remove older ones
+          docker image ls ghcr.io/${{ github.repository }}/* --format "table {{.Repository}}:{{.Tag}} {{.CreatedSince}}" | tail -n +2 | sort -k2 -r | tail -n +11 | awk '{print $1}' | xargs -r docker rmi || true
