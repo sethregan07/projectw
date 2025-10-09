@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mautic-service:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - MAUTIC_DB_HOST=mautic-db
+      - MAUTIC_DB_USER=${MAUTIC_DB_USER:-mautic}
+      - MAUTIC_DB_PASSWORD=${MAUTIC_DB_PASSWORD:-mauticpass}
+      - MAUTIC_DB_NAME=${MAUTIC_DB_NAME:-mautic}
+      - MAUTIC_ADMIN_EMAIL=${MAUTIC_ADMIN_EMAIL:-admin@example.com}
+      - MAUTIC_ADMIN_PASSWORD=${MAUTIC_ADMIN_PASSWORD:-adminpass}
+      - MAUTIC_SECRET_KEY=${MAUTIC_SECRET_KEY:-mautic-secret-key}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME:-Marketing System}
+      - MAIL_FROM_EMAIL=${MAIL_FROM_EMAIL:-marketing@yourdomain.com}
+      - MAIL_TRANSPORT=${MAIL_TRANSPORT:-smtp}
+      - MAIL_HOST=${MAIL_HOST:-smtp.mailgun.org}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USER=${MAIL_USER:-your-mailgun-user}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-your-mailgun-password}
+    depends_on:
+      - mautic-db
+    networks:
+      - mautic-network
+      - backend-network
+
+  mautic-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MAUTIC_DB_ROOT_PASSWORD:-rootpass}
+      - MYSQL_DATABASE=${MAUTIC_DB_NAME:-mautic}
+      - MYSQL_USER=${MAUTIC_DB_USER:-mautic}
+      - MYSQL_PASSWORD=${MAUTIC_DB_PASSWORD:-mauticpass}
+    volumes:
+      - mautic-db-data:/var/lib/mysql
+    networks:
+      - mautic-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mautic-db-data:
+
+networks:
+  mautic-network:
+    driver: bridge
+  backend-network:
+    driver: bridge

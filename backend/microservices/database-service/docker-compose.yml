@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  database-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: database-service
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,ghost_db,mautic_db,analytics_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - database-data:/var/lib/postgresql/data
+      - database-backup:/var/lib/postgresql/backup
+      - database-archive:/var/lib/postgresql/archive
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Database replication for disaster recovery
+  database-replica:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: database-replica
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - database-replica-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    depends_on:
+      - database-service
+    command: >
+      bash -c "
+        until pg_isready -h database-service -U postgres; do
+          echo 'Waiting for primary database to be ready...'
+          sleep 2
+        done
+        
+        if [ ! -f /var/lib/postgresql/data/pgdata/standby.signal ]; then
+          echo 'Initializing replica...'
+          rm -rf /var/lib/postgresql/data/pgdata/*
+          pg_basebackup -h database-service -U replicator -p 5432 -D /var/lib/postgresql/data/pgdata -P -v -R
+          touch /var/lib/postgresql/data/pgdata/standby.signal
+        fi
+        
+        postgres
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Backup service
+  database-backup:
+    image: postgres:15-alpine
+    container_name: database-backup
+    restart: unless-stopped
+    volumes:
+      - database-backup:/backup
+      - ./backup-script.sh:/backup-script.sh
+    networks:
+      - microservices-network
+    depends_on:
+      - database-service
+    command: >
+      bash -c "
+        chmod +x /backup-script.sh
+        echo '0 2 * * * /backup-script.sh' > /var/spool/cron/crontabs/root
+        crond -f
+      "
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+networks:
+  microservices-network:
+    driver: bridge
+    name: microservices-network
+    external: true
+
+volumes:
+  database-data:
+    driver: local
+  database-replica-data:
+    driver: local
+  database-backup:
+    driver: local
+  database-archive:
+    driver: local

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  ghost-service:
+    build: .
+    ports:
+      - "2368:2368"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://ghost:ghostpass@ghost-db:3306/ghost
+      - GHOST_HOST=http://localhost:2368
+      - GHOST_PORT=2368
+      - MAIL_SERVICE=smtp
+      - MAIL_HOST=${MAIL_HOST:-smtp.mailgun.org}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USER=${MAIL_USER:-your-mailgun-user}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-your-mailgun-password}
+    depends_on:
+      - ghost-db
+    networks:
+      - ghost-network
+      - backend-network
+
+  ghost-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=ghost
+      - MYSQL_USER=ghost
+      - MYSQL_PASSWORD=ghostpass
+    volumes:
+      - ghost-db-data:/var/lib/mysql
+    networks:
+      - ghost-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ghost-db-data:
+
+networks:
+  ghost-network:
+    driver: bridge
+  backend-network:
+    driver: bridge

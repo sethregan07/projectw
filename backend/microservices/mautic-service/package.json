@@ -1,0 +1,11 @@
+{
+  "name": "mautic-service",
+  "version": "1.0.0",
+  "description": "Mautic Microservice",
+  "main": "index.php",
+  "scripts": {
+    "start": "echo 'Mautic service running' && sleep infinity"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

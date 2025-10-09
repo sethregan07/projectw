@@ -1,0 +1,268 @@
+version: '3.8'
+
+services:
+  # API Gateway - Entry point for all services
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - GHOST_SERVICE_URL=http://ghost-service:2368
+      - MAUTIC_SERVICE_URL=http://mautic-service:8000
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - ghost-service
+      - mautic-service
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Authentication Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=database-service
+      - DB_PORT=5432
+      - DB_NAME=auth
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - JWT_SECRET=${JWT_SECRET:-supersecretkey}
+      - JWT_EXPIRY=24h
+    networks:
+      - microservices-network
+    depends_on:
+      - database-service
+    volumes:
+      - ./auth-service/logs:/usr/src/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Ghost CMS Service
+  ghost-service:
+    build:
+      context: ./ghost-service
+      dockerfile: Dockerfile
+    container_name: ghost-service
+    restart: unless-stopped
+    environment:
+      - database__client=postgres
+      - database__connection__host=database-service
+      - database__connection__port=5432
+      - database__connection__user=postgres
+      - database__connection__password=postgres
+      - database__connection__database=ghost_db
+      - url=http://localhost:2368
+    networks:
+      - microservices-network
+    depends_on:
+      - database-service
+    volumes:
+      - ghost-content:/var/lib/ghost/content
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:2368/ghost/api/v3/admin/site/"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Mautic Marketing Service
+  mautic-service:
+    build:
+      context: ./mautic-service
+      dockerfile: Dockerfile
+    container_name: mautic-service
+    restart: unless-stopped
+    environment:
+      - MAUTIC_DB_HOST=database-service
+      - MAUTIC_DB_PORT=5432
+      - MAUTIC_DB_NAME=mautic_db
+      - MAUTIC_DB_USER=postgres
+      - MAUTIC_DB_PASSWORD=postgres
+      - MAUTIC_ADMIN_EMAIL=admin@example.com
+      - MAUTIC_ADMIN_PASSWORD=mauticadmin
+    networks:
+      - microservices-network
+    depends_on:
+      - database-service
+    volumes:
+      - mautic-data:/var/www/html
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Database Service
+  database-service:
+    build:
+      context: ./database-service
+      dockerfile: Dockerfile
+    container_name: database-service
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,ghost_db,mautic_db,analytics_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - database-data:/var/lib/postgresql/data
+      - database-backup:/var/lib/postgresql/backup
+      - database-archive:/var/lib/postgresql/archive
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Monitoring Service - Prometheus
+  monitoring-service:
+    image: prom/prometheus:latest
+    container_name: monitoring-service
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - microservices-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Logging Service - ELK Stack
+  logging-service:
+    image: sebp/elk:latest
+    container_name: logging-service
+    restart: unless-stopped
+    ports:
+      - "5601:5601"  # Kibana
+      - "9200:9200"  # Elasticsearch
+      - "5044:5044"  # Logstash
+    volumes:
+      - ./logging/logstash.conf:/etc/logstash/conf.d/logstash.conf
+      - elk-data:/var/lib/elasticsearch
+    networks:
+      - microservices-network
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Tracing Service - Jaeger
+  tracing-service:
+    image: jaegertracing/all-in-one:latest
+    container_name: tracing-service
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # UI
+      - "14268:14268"  # Collector
+    networks:
+      - microservices-network
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:16686/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+networks:
+  microservices-network:
+    driver: bridge
+    name: microservices-network
+
+volumes:
+  database-data:
+    driver: local
+  database-backup:
+    driver: local
+  database-archive:
+    driver: local
+  ghost-content:
+    driver: local
+  mautic-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  elk-data:
+    driver: local

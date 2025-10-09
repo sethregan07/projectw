@@ -1,0 +1,38 @@
+{
+  "url": "http://localhost:2368",
+  "server": {
+    "port": 2368,
+    "host": "0.0.0.0"
+  },
+  "database": {
+    "client": "mysql",
+    "connection": {
+      "host": "ghost_db",
+      "port": 3306,
+      "user": "ghost",
+      "password": "ghostpass",
+      "database": "ghost"
+    }
+  },
+  "mail": {
+    "transport": "Direct",
+    "from": "ghost@localhost"
+  },
+  "logging": {
+    "level": "info",
+    "rotation": {
+      "enabled": true
+    },
+    "transports": ["file", "stdout"]
+  },
+  "paths": {
+    "contentPath": "/var/lib/ghost/content"
+  },
+  "privacy": {
+    "useUpdateCheck": false
+  },
+  "security": {
+    "sessionSecret": "${SESSION_SECRET}",
+    "passwordResetTokenExpiry": "24h"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "ghost-service",
+  "version": "1.0.0",
+  "description": "Ghost CMS Microservice",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo 'Ghost service running' && sleep infinity"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
