@@ -1,0 +1,25 @@
+filebeat.inputs:
+- type: container
+  paths:
+    - /var/lib/docker/containers/*/*.log
+  processors:
+    - add_docker_metadata:
+        host: "unix:///var/run/docker.sock"
+        match_source: true
+        match_source_index: 4
+
+- type: log
+  paths:
+    - "/var/log/health.log"
+  fields:
+    service: "health-check"
+
+output.elasticsearch:
+  hosts: ["elasticsearch-lite:9200"]
+  index: "filebeat-%{+yyyy.MM.dd}"
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /usr/share/filebeat/logs
+  name: filebeat.log

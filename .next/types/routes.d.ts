@@ -6,7 +6,7 @@ type AppRouteHandlerRoutes = "/api/auth/change-password" | "/api/auth/health" | 
 type PageRoutes = never
 type LayoutRoutes = "/"
 type RedirectRoutes = never
-type RewriteRoutes = "/api/auth/[[...path]]" | "/api/users/[[...path]]"
+type RewriteRoutes = "/api/auth/[[...path]]" | "/api/users/[[...path]]" | "/api/v1/ghost/[[...path]]"
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
 
 
@@ -20,6 +20,7 @@ interface ParamMap {
   "/api/auth/profile": {}
   "/api/auth/register": {}
   "/api/users/[[...path]]": { "path"?: string[]; }
+  "/api/v1/ghost/[[...path]]": { "path"?: string[]; }
   "/articles": {}
   "/articles/[slug]": { "slug": string; }
   "/dashboard": {}

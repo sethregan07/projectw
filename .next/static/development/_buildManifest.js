@@ -6,6 +6,9 @@ self.__BUILD_MANIFEST = {
       },
       {
         "source": "/api/users/:path*"
+      },
+      {
+        "source": "/api/v1/ghost/:path*"
       }
     ],
     "beforeFiles": [],
