@@ -17,15 +17,22 @@ const nextConfig = {
       }
     ]
   },
+  experimental: {
+    turbopack: false // Disable turbopack to avoid lightningcss build issues in Docker
+  },
   async rewrites() {
     return [
       {
         source: '/api/auth/:path*',
-        destination: 'http://localhost:3001/api/auth/:path*',
+        destination: 'http://api-gateway:3000/api/auth/:path*',
       },
       {
         source: '/api/users/:path*',
-        destination: 'http://localhost:3001/api/users/:path*',
+        destination: 'http://api-gateway:3000/api/users/:path*',
+      },
+      {
+        source: '/api/v1/ghost/:path*',
+        destination: 'http://ghost-service:2368/ghost/api/v4/:path*',
       }
     ];
   }

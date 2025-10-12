@@ -1,0 +1,108 @@
+{
+  "dashboard": {
+    "title": "Microservices Architecture Overview",
+    "description": "Comprehensive monitoring dashboard for privacy-focused microservices",
+    "tags": ["microservices", "docker", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Service Health Status",
+        "type": "table",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "up{job=~\".*\"}",
+            "legendFormat": "{{job}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "API Gateway Request Rate",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"api-gateway\"}[5m])",
+            "legendFormat": "Requests/sec",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Database Connections",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "pg_stat_activity_count{state=\"active\"}",
+            "legendFormat": "Active Connections",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Container Resource Usage",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total[5m])",
+            "legendFormat": "{{container_name}} CPU",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Authentication Service Metrics",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"auth-service\"}[5m])",
+            "legendFormat": "Auth Requests",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Web3 Identity Registrations",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 8, "x": 0, "y": 24 },
+        "targets": [
+          {
+            "expr": "web3_identity_registrations_total",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Blockchain Transactions",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 8, "x": 8, "y": 24 },
+        "targets": [
+          {
+            "expr": "blockchain_transactions_total",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Privacy Protocol Violations",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 8, "x": 16, "y": 24 },
+        "targets": [
+          {
+            "expr": "privacy_violations_total",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "time": { "from": "now-1h", "to": "now" },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "links": []
+  }
+}
