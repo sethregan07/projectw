@@ -12,7 +12,7 @@ import { jwtDecode } from 'jwt-decode';
 const AUTH_SERVICE_URL = '/api';
 
 // Types
-interface UserData {
+export interface UserData {
   id: string;
   name: string;
   email: string;

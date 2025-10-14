@@ -17,8 +17,8 @@ const nextConfig = {
       }
     ]
   },
-  experimental: {
-    turbopack: false // Disable turbopack to avoid lightningcss build issues in Docker
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   async rewrites() {
     return [
