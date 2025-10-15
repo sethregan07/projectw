@@ -1,1 +1,10 @@
-{"pages":{},"app":{"/home/seth/Desktop/projectw/src/app/layout":["static/media/7b0b24f36b1a6d0b.p.woff2"]},"appUsingSizeAdjust":false,"pagesUsingSizeAdjust":false}
+{
+  "app": {
+    "[project]/src/app/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

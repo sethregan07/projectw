@@ -1,1 +1,21 @@
-self.__BUILD_MANIFEST = (function(a){return {__rewrites:{afterFiles:[{has:a,source:"\u002Fapi\u002Fauth\u002F:path*",destination:a},{has:a,source:"\u002Fapi\u002Fusers\u002F:path*",destination:a},{has:a,source:"\u002Fapi\u002Fv1\u002Fghost\u002F:path*",destination:a}],beforeFiles:[],fallback:[]},__routerFilterStatic:a,__routerFilterDynamic:a,sortedPages:["\u002F_app"]}}(void 0));self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()
+self.__BUILD_MANIFEST = {
+  "__rewrites": {
+    "afterFiles": [
+      {
+        "source": "/api/auth/:path*"
+      },
+      {
+        "source": "/api/users/:path*"
+      },
+      {
+        "source": "/api/v1/ghost/:path*"
+      }
+    ],
+    "beforeFiles": [],
+    "fallback": []
+  },
+  "sortedPages": [
+    "/_app",
+    "/_error"
+  ]
+};self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()
