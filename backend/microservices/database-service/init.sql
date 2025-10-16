@@ -1,11 +1,24 @@
 -- Database initialization script
 -- This script creates the necessary databases and users for all microservices
 
--- Create databases
-CREATE DATABASE IF NOT EXISTS auth_db;
-CREATE DATABASE IF NOT EXISTS ghost_db;
-CREATE DATABASE IF NOT EXISTS mautic_db;
-CREATE DATABASE IF NOT EXISTS analytics_db;
+-- Create databases (PostgreSQL-style conditional creation)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'auth') THEN
+        PERFORM dblink_exec('initprivs,SYSTEM,' || '-CREATE DATABASE auth');
+        EXECUTE 'CREATE DATABASE auth';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'ghost_db') THEN
+        EXECUTE 'CREATE DATABASE ghost_db';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'mautic_db') THEN
+        EXECUTE 'CREATE DATABASE mautic_db';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'analytics_db') THEN
+        EXECUTE 'CREATE DATABASE analytics_db';
+    END IF;
+END
+$$;
 
 -- Switch to auth_db and create schema
 \c auth_db;

@@ -1,18 +1,51 @@
 globalThis.__BUILD_MANIFEST = {
-  "polyfillFiles": [
-    "static/chunks/polyfills.js"
-  ],
+  "pages": {
+    "/_app": [
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_5277ebc8.js",
+      "static/chunks/node_modules_next_dist_compiled_e019967a._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_ffb1a49d._.js",
+      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
+      "static/chunks/node_modules_next_dist_3b64f844._.js",
+      "static/chunks/node_modules_next_app_72f3d36f.js",
+      "static/chunks/[next]_entry_page-loader_ts_742e4b53._.js",
+      "static/chunks/node_modules_react-dom_4411d9bd._.js",
+      "static/chunks/node_modules_db4bb196._.js",
+      "static/chunks/[root-of-the-server]__be103ac6._.js",
+      "static/chunks/src_pages__app_2da965e7._.js",
+      "static/chunks/turbopack-src_pages__app_ac0ab6d7._.js"
+    ],
+    "/_error": [
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_5277ebc8.js",
+      "static/chunks/node_modules_next_dist_compiled_e019967a._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_80dd6ac5._.js",
+      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
+      "static/chunks/node_modules_next_dist_f7abec85._.js",
+      "static/chunks/node_modules_next_error_1cfbb379.js",
+      "static/chunks/[next]_entry_page-loader_ts_43b523b5._.js",
+      "static/chunks/node_modules_react-dom_4411d9bd._.js",
+      "static/chunks/node_modules_db4bb196._.js",
+      "static/chunks/[root-of-the-server]__a2d5dfc8._.js",
+      "static/chunks/src_pages__error_2da965e7._.js",
+      "static/chunks/turbopack-src_pages__error_6b333765._.js"
+    ]
+  },
   "devFiles": [],
   "ampDevFiles": [],
+  "polyfillFiles": [
+    "static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
   "lowPriorityFiles": [],
   "rootMainFiles": [
-    "static/chunks/webpack.js",
-    "static/chunks/main-app.js"
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_57d40746._.js",
+    "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+    "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
+    "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
+    "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
+    "static/chunks/node_modules_next_dist_b0daae9a._.js",
+    "static/chunks/node_modules_@swc_helpers_cjs_b3dc30d6._.js",
+    "static/chunks/_a0ff3932._.js",
+    "static/chunks/turbopack-_cdba956c._.js"
   ],
-  "rootMainFilesTree": {},
-  "pages": {
-    "/_app": []
-  },
   "ampFirstPages": []
 };
 globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
