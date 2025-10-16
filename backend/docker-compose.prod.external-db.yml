@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  # Frontend - Next.js Application
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:5000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - microservices-network
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # API Gateway - Entry point for all services
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - GHOST_SERVICE_URL=http://ghost-service:2368
+      - MAUTIC_SERVICE_URL=http://mautic-service:8000
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Authentication Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=${DB_HOST:-database-vps-ip}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-auth}
+      - DB_USER=${DB_USER:-auth_user}
+      - DB_PASSWORD=${DB_PASSWORD:-secure_password}
+      - JWT_SECRET=${JWT_SECRET:-supersecretkey}
+      - JWT_EXPIRY=24h
+    networks:
+      - microservices-network
+    volumes:
+      - auth-service-logs:/usr/src/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Ghost CMS Service
+  ghost-service:
+    build:
+      context: ./ghost-service
+      dockerfile: Dockerfile
+    container_name: ghost-service
+    restart: unless-stopped
+    environment:
+      - database__client=postgres
+      - database__connection__host=${DB_HOST:-database-vps-ip}
+      - database__connection__port=5432
+      - database__connection__user=${DB_USER:-ghost_user}
+      - database__connection__password=${DB_PASSWORD:-secure_password}
+      - database__connection__database=ghost_db
+      - url=http://localhost:2368
+    networks:
+      - microservices-network
+    volumes:
+      - ghost-content:/var/lib/ghost/content
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:2368/ghost/api/v3/admin/site/"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Mautic Marketing Service
+  mautic-service:
+    build:
+      context: ./mautic-service
+      dockerfile: Dockerfile
+    container_name: mautic-service
+    restart: unless-stopped
+    environment:
+      - MAUTIC_DB_HOST=${DB_HOST:-database-vps-ip}
+      - MAUTIC_DB_PORT=5432
+      - MAUTIC_DB_NAME=mautic_db
+      - MAUTIC_DB_USER=${DB_USER:-mautic_user}
+      - MAUTIC_DB_PASSWORD=${DB_PASSWORD:-secure_password}
+      - MAUTIC_ADMIN_EMAIL=admin@example.com
+      - MAUTIC_ADMIN_PASSWORD=mauticadmin
+    networks:
+      - microservices-network
+    volumes:
+      - mautic-data:/var/www/html
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  microservices-network:
+    driver: bridge
+    name: microservices-network
+
+volumes:
+  ghost-content:
+    driver: local
+  mautic-data:
+    driver: local
+  auth-service-logs:
+    driver: local
