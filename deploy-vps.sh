@@ -76,6 +76,66 @@ sudo docker-compose up -d
 echo "Waiting for services to start..."
 sleep 60
 
+# Restore databases
+echo "Restoring databases..."
+if [ -f "/opt/new-platform/scripts/restore-databases.sh" ]; then
+    sudo /opt/new-platform/scripts/restore-databases.sh
+else
+    echo "Database restoration script not found, creating and running..."
+    # Create database restoration script inline
+    cat > /tmp/restore-databases.sh << 'EOF'
+#!/bin/bash
+set -e
+echo "🗄️  Starting database restoration..."
+
+# Wait for database service
+timeout=300
+counter=0
+while ! sudo docker exec database-service pg_isready -U postgres -h localhost >/dev/null 2>&1; do
+    if [ $counter -ge $timeout ]; then
+        echo "Database service not ready after $timeout seconds"
+        exit 1
+    fi
+    counter=$((counter + 5))
+    echo "Waiting... ($counter/$timeout seconds)"
+    sleep 5
+done
+
+echo "Database service is ready!"
+
+# Create databases
+echo "Creating databases..."
+sudo docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS auth_db;" || true
+sudo docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS ghost_db;" || true
+sudo docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS mautic_db;" || true
+sudo docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS analytics_db;" || true
+
+# Restore auth database if backup exists
+if [ -f "/opt/new-platform/backend/microservices/auth-service/backups/auth_db_backup_*.sql.gz" ]; then
+    echo "Restoring auth database..."
+    BACKUP_FILE=$(ls -t /opt/new-platform/backend/microservices/auth-service/backups/auth_db_backup_*.sql.gz | head -1)
+    echo "Using backup: $BACKUP_FILE"
+    gunzip -c "$BACKUP_FILE" | sudo docker exec -i database-service psql -U postgres -d auth_db
+    echo "✅ Auth database restored"
+else
+    echo "No auth database backup found, initializing fresh..."
+    # Initialize auth database schema
+    sudo docker cp /opt/new-platform/backend/microservices/auth-service/init-db.sql database-service:/tmp/init-db.sql
+    sudo docker exec database-service psql -U postgres -d auth_db -f /tmp/init-db.sql
+
+    # Add test users
+    sudo docker cp /opt/new-platform/backend/microservices/auth-service/init-user.sql database-service:/tmp/init-user.sql
+    sudo docker exec database-service psql -U postgres -d auth_db -f /tmp/init-user.sql
+    echo "✅ Auth database initialized with test data"
+fi
+
+echo "🗄️  Database restoration completed!"
+EOF
+
+    chmod +x /tmp/restore-databases.sh
+    sudo /tmp/restore-databases.sh
+fi
+
 # Check if services are running
 echo "Checking service status..."
 sudo docker-compose ps

@@ -1,34 +1,9 @@
 #!/bin/bash
+# Database restoration script for ProjectW
 
-echo "Cleaning up..."
+set -e
 
-# Kill any process using frontend port 5002
-lsof -ti:5002 | xargs kill -9 2>/dev/null || true
-
-# Clean up docker containers and orphans
-cd backend/microservices
-
-# Create a dev version without frontend service to avoid conflict
-sed '/^  frontend:/,/^  # [^ ]/ { /  frontend:/d; /\(^  # API Gateway\|^  # Authentication\|^  # Ghost\|^  # Mautic\|^  # Database\|^  # Monitoring\|^  # Logging\|^  # Tracing\)/!d; }' docker-compose.yml > dev-compose.yml
-
-docker-compose down --volumes --remove-orphans
-
-echo "Starting frontend in background..."
-cd ../..
-npm run dev &
-
-echo "Starting backend services..."
-cd backend/microservices
-
-docker-compose -f dev-compose.yml up --build -d
-
-# Wait for services to be ready
-echo "Waiting for services to start..."
-sleep 30
-
-# Initialize databases
-echo "Initializing databases..."
-cd ../..
+echo "🗄️  Starting database restoration..."
 
 # Wait for database service to be ready
 echo "Waiting for database service..."
@@ -55,11 +30,11 @@ docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS 
 
 # Restore auth database if backup exists
 if [ -f "backend/microservices/auth-service/backups/auth_db_backup_*.sql.gz" ]; then
-    echo "Restoring auth database from backup..."
+    echo "Restoring auth database..."
     BACKUP_FILE=$(ls -t backend/microservices/auth-service/backups/auth_db_backup_*.sql.gz | head -1)
     echo "Using backup: $BACKUP_FILE"
     gunzip -c "$BACKUP_FILE" | docker exec -i database-service psql -U postgres -d auth_db
-    echo "✅ Auth database restored from backup"
+    echo "✅ Auth database restored"
 else
     echo "No auth database backup found, initializing fresh..."
     # Initialize auth database schema
@@ -75,33 +50,14 @@ fi
 # Restore other databases if backups exist
 for db in ghost_db mautic_db analytics_db; do
     if ls backend/microservices/auth-service/backups/${db}_backup_*.sql.gz 1> /dev/null 2>&1; then
-        echo "Restoring $db from backup..."
+        echo "Restoring $db..."
         BACKUP_FILE=$(ls -t backend/microservices/auth-service/backups/${db}_backup_*.sql.gz | head -1)
         echo "Using backup: $BACKUP_FILE"
         gunzip -c "$BACKUP_FILE" | docker exec -i database-service psql -U postgres -d $db
-        echo "✅ $db restored from backup"
+        echo "✅ $db restored"
     else
         echo "No backup found for $db, skipping..."
     fi
 done
 
-echo "🗄️  Database initialization completed!"
-
-# Final status check
-echo ""
-echo "🎉 Services are now running!"
-echo ""
-echo "Service Status:"
-echo "- Frontend: http://localhost:5002"
-echo "- API Gateway: http://localhost:3000"
-echo "- Auth Service: http://localhost:3001"
-echo "- Database: localhost:5432"
-echo "- Monitoring: http://localhost:9090"
-echo "- Logs: http://localhost:5601"
-echo ""
-echo "✅ All services started successfully with databases restored!"
-echo ""
-
-# Clean up dev file
-cd backend/microservices
-rm dev-compose.yml
+echo "🗄️  Database restoration completed!"

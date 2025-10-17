@@ -190,8 +190,83 @@ apt install -y certbot python3-certbot-nginx
 echo "✅ SSL tools installed"
 echo ""
 
-# Step 14: Final system status check
-echo "📊 STEP 14: Performing final checks..."
+# Step 14: Setup database restoration automation
+echo "🗄️  STEP 14: Setting up database restoration automation..."
+
+# Create database restoration script
+cat > /opt/projectw/scripts/restore-databases.sh << 'EOF'
+#!/bin/bash
+# Database restoration script for ProjectW
+
+set -e
+
+echo "🗄️  Starting database restoration..."
+
+# Wait for database service to be ready
+echo "Waiting for database service..."
+timeout=300
+counter=0
+while ! docker exec database-service pg_isready -U postgres -h localhost >/dev/null 2>&1; do
+    if [ $counter -ge $timeout ]; then
+        echo "Database service not ready after $timeout seconds"
+        exit 1
+    fi
+    counter=$((counter + 5))
+    echo "Waiting... ($counter/$timeout seconds)"
+    sleep 5
+done
+
+echo "Database service is ready!"
+
+# Create databases
+echo "Creating databases..."
+docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS auth_db;" || true
+docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS ghost_db;" || true
+docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS mautic_db;" || true
+docker exec database-service psql -U postgres -c "CREATE DATABASE IF NOT EXISTS analytics_db;" || true
+
+# Restore auth database if backup exists
+if [ -f "/opt/projectw/backups/auth_db_backup_*.sql.gz" ]; then
+    echo "Restoring auth database..."
+    BACKUP_FILE=$(ls -t /opt/projectw/backups/auth_db_backup_*.sql.gz | head -1)
+    echo "Using backup: $BACKUP_FILE"
+    gunzip -c "$BACKUP_FILE" | docker exec -i database-service psql -U postgres -d auth_db
+    echo "✅ Auth database restored"
+else
+    echo "No auth database backup found, initializing fresh..."
+    # Initialize auth database schema
+    docker cp /opt/projectw/backend/microservices/auth-service/init-db.sql database-service:/tmp/init-db.sql
+    docker exec database-service psql -U postgres -d auth_db -f /tmp/init-db.sql
+
+    # Add test users
+    docker cp /opt/projectw/backend/microservices/auth-service/init-user.sql database-service:/tmp/init-user.sql
+    docker exec database-service psql -U postgres -d auth_db -f /tmp/init-user.sql
+    echo "✅ Auth database initialized with test data"
+fi
+
+# Restore other databases if backups exist
+for db in ghost_db mautic_db analytics_db; do
+    if ls /opt/projectw/backups/${db}_backup_*.sql.gz 1> /dev/null 2>&1; then
+        echo "Restoring $db..."
+        BACKUP_FILE=$(ls -t /opt/projectw/backups/${db}_backup_*.sql.gz | head -1)
+        echo "Using backup: $BACKUP_FILE"
+        gunzip -c "$BACKUP_FILE" | docker exec -i database-service psql -U postgres -d $db
+        echo "✅ $db restored"
+    else
+        echo "No backup found for $db, skipping..."
+    fi
+done
+
+echo "🗄️  Database restoration completed!"
+EOF
+
+chmod +x /opt/projectw/scripts/restore-databases.sh
+
+echo "✅ Database restoration script created"
+echo ""
+
+# Step 15: Final system status check
+echo "📊 STEP 15: Performing final checks..."
 
 echo "Service Status:"
 echo "- Docker: $(systemctl is-active docker)"
@@ -216,14 +291,16 @@ echo ""
 echo "🎉 Your VPS is now ready for ProjectW deployment!"
 echo ""
 echo "📋 NEXT STEPS:"
-echo "1. Copy your project files: scp your-project.tar.gz root@YOUR_VPS_IP:/opt/"
-echo "2. Extract and deploy: tar xzf your-project.tar.gz && cd your-project"
-echo "3. Run deployment: ./deploy-vps.sh or docker-compose up -d"
+echo "1. Copy your project files: scp projectw-setup.tar.gz root@YOUR_VPS_IP:/opt/projectw/"
+echo "2. Extract and deploy: cd /opt/projectw && tar xzf projectw-setup.tar.gz"
+echo "3. Run deployment: ./deploy-vps.sh"
+echo "4. Restore databases: ./scripts/restore-databases.sh"
 echo ""
 echo "🔧 MANUAL COMMANDS IF NEEDED:"
 echo "• Check services: docker ps && systemctl status docker"
 echo "• Monitor resources: htop && df -h"
 echo "• View logs: docker-compose logs -f"
+echo "• Restore databases manually: /opt/projectw/scripts/restore-databases.sh"
 echo ""
 echo "🚀 You can now run your deployment scripts!"
 
