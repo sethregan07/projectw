@@ -1,0 +1,235 @@
+#!/bin/bash
+#
+# PRODUCTION CONFIGURATION - World-Class Best Practices Implementation
+# Copy this file and customize with your actual credentials
+#
+# Security Best Practices:
+# - Use environment variables or secret vaults instead of plain text
+# - Rotate API keys regularly (90 days)
+# - Use read-only API keys where possible
+# - Enable 2FA/MFA on all provider accounts
+# - Store keys encrypted with age/sops or similar
+
+# ======================================
+# PROVIDER API KEYS (SECURE STORAGE)
+# ======================================
+# Best Practice: Use encrypted secrets management like:
+# - AWS Secrets Manager
+# - HashiCorp Vault
+# - Azure Key Vault
+# - 1Password/ServiceNow
+# - Kubernetes secrets with encryption
+
+# Example: Load from encrypted file or environment
+if [ -f "$HOME/.vps_secrets.enc" ]; then
+    # Decrypt using age or sops
+    export HCLOUD_TOKEN=$(age -d -i ~/.age/key.txt ~/.vps_secrets.enc | grep HCLOUD_TOKEN | cut -d'=' -f2)
+    export DIGITALOCEAN_TOKEN=$(age -d -i ~/.age/key.txt ~/.vps_secrets.enc | grep DIGITALOCEAN_TOKEN | cut -d'=' -f2)
+    export VULTR_API_KEY=$(age -d -i ~/.age/key.txt ~/.vps_secrets.enc | grep VULTR_API_KEY | cut -d'=' -f2)
+    export LINODE_TOKEN=$(age -d -i ~/.age/key.txt ~/.vps_secrets.enc | grep LINODE_TOKEN | cut -d'=' -f2)
+else
+    # Fallback - NEVER use in production
+    # export HCLOUD_TOKEN="your-encrypted-token-here"
+    # export DIGITALOCEAN_TOKEN="your-encrypted-token-here"
+    # export VULTR_API_KEY="your-encrypted-token-here"
+    echo "ERROR: Encrypted secrets file not found. Configure secrets management."
+    exit 1
+fi
+
+# ======================================
+# SSH SECURITY (World-Class Practices)
+# ======================================
+# Best Practices:
+# - Ed25519 keys (quantum-resistant)
+# - Hardware security keys (YubiKey/Titan)
+# - SSH certificates instead of keys
+# - Agent forwarding disabled
+# - Strict host key checking
+# - Key rotation every 90 days
+
+export SSH_USER="root"
+export SSH_KEY_PATH="$HOME/.ssh/recovery_ed25519"
+export SSH_CERT_PATH="$HOME/.ssh/recovery-cert.pub"
+export SSH_CONFIG="$HOME/.ssh/config"
+
+# SSH Certificate Authority (advanced)
+export SSH_CA_KEY="$HOME/.ssh/ca"
+export SSH_CERT_VALIDITY="52w"  # 1 year
+
+# ======================================
+# HIGH-PERFORMANCE RSYNC TUNING
+# ======================================
+# World-Class Performance Settings:
+# - Parallel transfers with optimized threads
+# - LZ4 compression for speed vs ratio
+# - Optimized block sizes
+# - Bandwidth management with QoS
+
+export RSYNC_PARALLEL_JOBS=8              # Scale with CPU cores
+export RSYNC_BW_LIMIT="50M"               # 50MB/s limit to avoid saturation
+export COMPRESSION_LEVEL=3                # LZ4 optimal (1-9)
+export RSYNC_BLOCK_SIZE="1M"              # Larger blocks for speed
+export RSYNC_TIMEOUT=1800                 # 30min timeout
+export RSYNC_MAX_RETRIES=3                # Robust retry logic
+
+# Network optimization
+export TCP_CONGESTION="bbr"              # Google's BBR for speed
+export SOCKET_BUFFER_SIZE="4194304"      # 4MB socket buffers
+
+# ======================================
+# PROVIDER INSTANCE OPTIMIZATION
+# ======================================
+# Right-size instances for specific workloads
+# Cost optimization + performance balance
+
+# Production instance sizes (balanced cost/performance)
+export HETZNER_SIZE_PROD="cx41"          # 4vCPU, 16GB RAM, production
+export HETZNER_SIZE_BACKUP="cx31"        # 2vCPU, 8GB RAM, backup
+export DIGITALOCEAN_SIZE_PROD="s-4vcpu-8gb"
+export DIGITALOCEAN_SIZE_BACKUP="s-2vcpu-4gb"
+export VULTR_SIZE_PROD="vc2-4c-8gb"
+export VULTR_SIZE_BACKUP="vc2-2c-4gb"
+
+# Regions optimized for your users
+export DEFAULT_PROVIDER="hetzner"        # Primary: reliable, fast
+export DEFAULT_REGION="fsn1"             # Frankfurt: central EU
+export BACKUP_REGION="nbg1"              # Nuremberg: secondary EU
+export DISASTER_REGION="ash"             # Ashburn: transatlantic failover
+
+# Cross-provider redundancy
+export REDUNDANCY_PROVIDER="digitalocean"  # Different infrastructure
+export REDUNDANCY_REGION="nyc1"
+
+# ======================================
+# MONITORING & ALERTING (Enterprise Grade)
+# ======================================
+# Best Practices:
+# - Multiple notification channels
+# - Escalation policies
+# - Incident response automation
+# - Metrics collection & dashboards
+
+# Multiple notification endpoints
+export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK"
+export TEAMS_WEBHOOK_URL="https://outlook.office.com/webhook/YOUR/TEAMS/WEBHOOK"
+export EMAIL_NOTIFICATION="alerts@yourcompany.com"
+
+# Incident escalation
+export ESCALATION_WEBHOOK="https://api.pagerduty.com/incidents"
+export ONCALL_WEBHOOK="https://api.opsgenie.com/alerts"
+
+# Health monitoring
+export HEALTH_CHECK_INTERVAL=60          # 1 minute checks
+export ALERT_CPU_THRESHOLD=80           # Alert at 80% CPU
+export ALERT_MEMORY_THRESHOLD=85        # Alert at 85% memory
+export ALERT_DISK_THRESHOLD=90          # Alert at 90% disk
+export ALERT_SERVICES_DOWN_THRESHOLD=1  # Alert if any critical service down
+
+# ======================================
+# COMPLIANCE & AUDIT (GDPR/SOC2/ISO27001)
+# ======================================
+# Enterprise compliance requirements
+
+# Audit logging
+export AUDIT_LOG_PATH="/var/log/vps_cloning/audit.log"
+export AUDIT_RETENTION_DAYS=2555         # 7 years for compliance
+export COMPLIANCE_MODE="gdpr"           # gdpr|hipaa|pci|soc2
+
+# Data classification
+export SENSITIVE_DATA_PATTERNS="*.key,*.pem,*.p12,passwords/*,secrets/*"
+
+# Encryption standards
+export ENCRYPTION_ALGORITHM="aes-256-gcm"  # FIPS 140-2 compliant
+export KEY_ROTATION_DAYS=30             # NIST recommendations
+
+# Retention policies
+export CLONE_RETENTION_HOT=7            # Hot clones: 7 days
+export CLONE_RETENTION_WARM=30          # Warm clones: 30 days
+export CLONE_RETENTION_COLD=365         # Cold clones: 1 year
+
+# ======================================
+# ADVANCED FEATURES (Cutting Edge)
+# ======================================
+
+# AI/ML optimization
+export PREDICTIVE_SCALING=true          # AI-based instance scaling
+export ANOMALY_DETECTION=true           # ML anomaly detection
+
+# Cloud-native features
+export SPOT_INSTANCE_MODE=false         # Use spot instances for cost
+export MULTI_CLOUD_SCHEDULING=true      # Optimal provider selection
+export GEO_REDUNDANCY=true              # Geographic redundancy
+
+# Performance optimization
+export PARALLEL_TRANSFERS=true          # Parallel file transfers
+export DEDUPLICATION=true               # Deduplicate transfers
+export COMPRESSION_ACCELERATION=true    # Hardware acceleration
+
+# Security enhancements
+export ZERO_TRUST_MODE=true             # Zero-trust networking
+export END_TO_END_ENCRYPTION=true       # End-to-end encryption
+export QUANTUM_RESISTANT_KEYS=true      # Prepare for quantum computing
+
+# ======================================
+# INFRASTRUCTURE AS CODE (IaC)
+# ======================================
+# Best Practice: Declare all infrastructure
+
+export TERRAFORM_STATE_BUCKET="your-terraform-state"
+export ANSIBLE_INVENTORY_PATH="./inventory"
+export CLOUDFORMATION_STACK_NAME="vps-cloning-dr"
+
+# GitOps integration
+export GITOPS_REPO="git@github.com:yourorg/infrastructure.git"
+export CONFIG_DRIFT_DETECTION=true
+
+# ======================================
+# COST OPTIMIZATION (FinOps)
+# ======================================
+
+export COST_BUDGET_MONTHLY=500          # Monthly budget in USD
+export RESERVE_INSTANCES=true           # Use reserved instances
+export AUTO_TERMINATION=true            # Auto-terminate unused clones
+export COST_ALERT_THRESHOLD=80          # Alert at 80% budget usage
+
+# ======================================
+# DEVELOPMENT & TESTING
+# ======================================
+
+# Staging environment configuration
+export STAGING_PROVIDER="digitalocean"
+export STAGING_REGION="nyc1"
+export STAGING_AUTO_TERMINATE=true      # Auto cleanup staging
+
+# Chaos engineering
+export CHAOS_MONKEY_ENABLED=true        # Random failure injection
+export CHAOS_FAILURE_RATE=0.01          # 1% random failure rate
+
+# ======================================
+# EXPERT SETTINGS (Use with caution)
+# ======================================
+
+# Debug and troubleshooting
+export VERBOSE_LOGGING=false            # Reduce log noise in production
+export TRACE_EXECUTION=false            # Performance impact
+export PERFORMANCE_PROFILING=false       # Advanced debugging
+
+# Experimental features (beta)
+export BETA_FEATURES_ENABLED=false      # Enable experimental features
+export NIGHTLY_BUILDS=false             # Use nightly builds
+export CUTTING_EDGE_OPTIMIZATIONS=false # Use bleeding-edge optimizations
+
+# ======================================
+# VALIDATION & SAFETY CHECKS
+# ======================================
+
+# Safety checks
+export PRODUCTION_MODE=true             # Enable production safety checks
+export DATA_LOSS_PREVENTION=true        # Prevent accidental data loss
+export RATE_LIMITING_ENABLED=true       # Prevent API abuse
+
+# Validation
+export PRE_FLIGHT_CHECKS=true           # Comprehensive pre-flight checks
+export POST_CLONE_VALIDATION=true       # Validate clone integrity
+export SECURITY_AUDIT_ENABLED=true      # Continuous security auditing

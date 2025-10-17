@@ -1,0 +1,4 @@
+# Linux terminal shortcuts - use Ctrl+G for SIGINT (interrupt) instead of Ctrl+C
+"\C-c": copy
+"\C-v": paste
+"\C-g": interrupt

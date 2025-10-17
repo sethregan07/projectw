@@ -1,0 +1,11 @@
+2025-10-15 06:40:32 [INFO] 🚀 Starting VPS OS-Level Cloning System
+2025-10-15 06:40:32 [INFO] Checking system requirements...
+2025-10-15 06:40:33 [WARNING] Docker is not running. Some services may not be cloned properly.
+2025-10-15 06:40:33 [INFO] System requirements check completed ✓
+2025-10-15 06:40:33 [INFO] Loading configuration from /home/seth/Desktop/projectw/backend/scripts/cloning_config.conf
+2025-10-15 06:40:33 [WARNING] rsync SSH transport known to fail - switching to TAR method
+2025-10-15 06:40:33 [INFO] Starting TAR-based cloning process (reliable method)...
+2025-10-15 06:40:33 [INFO] Source: 102.215.228.243 (local system)
+2025-10-15 06:40:33 [INFO] Target: 151.241.14.12
+2025-10-15 06:40:33 [INFO] Creating system TAR archive and streaming to target...
+2025-10-15 06:40:33 [INFO] DRY RUN MODE - Simulating tar creation without transfer
