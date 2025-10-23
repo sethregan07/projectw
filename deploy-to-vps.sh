@@ -24,12 +24,13 @@ echo ""
 
 # Step 2: Sync to VPS
 echo "2️⃣ Syncing to VPS..."
-rsync -avz --quiet --delete --exclude='.git' --exclude='.next' --exclude='node_modules' . root@102.215.228.161:/tmp/new-platform-sync/ || {
+APP_DIR="/var/www/nextjs-app"
+rsync -avz --quiet --delete --exclude='.git' --exclude='.next' --exclude='node_modules' . root@102.215.228.161:"${APP_DIR}/" || {
     echo "   rsync failed, using alternative sync method..."
     # Alternative: tar + scp fallback
     tar czf /tmp/new-platform-local.tar.gz --exclude='.git' --exclude='.next' --exclude='node_modules' .
-    scp /tmp/new-platform-local.tar.gz root@102.215.228.161:/tmp/new-platform-sync.tar.gz
-    ssh root@102.215.228.161 'cd /tmp && tar xzf new-platform-sync.tar.gz && cp -r . /opt/new-platform-pm2-ip/' 2>/dev/null || true
+    scp /tmp/new-platform-local.tar.gz root@102.215.228.161:/tmp/
+    ssh root@102.215.228.161 "mkdir -p ${APP_DIR} && cd /tmp && tar xzf new-platform-local.tar.gz && cp -r * ${APP_DIR}/ && rm new-platform-local.tar.gz"
 }
 
 echo "✅ Code transfer completed"
@@ -37,10 +38,11 @@ echo ""
 
 # Step 3: Trigger VPS deployment
 echo "3️⃣ Triggering VPS deployment..."
-ssh root@102.215.228.161 "/opt/deployment/deploy.sh" || {
+echo "   Deploying with PM2 + Nginx..."
+ssh root@102.215.228.161 "cd ${APP_DIR} && export VPS_IP=102.215.228.161 && ./deploy-pm2-nginx.sh" || {
     echo "❌ VPS deployment failed"
     echo "Attempting manual restart..."
-    ssh root@102.215.228.161 'cd /opt/new-platform-pm2-ip && npm run build && pm2 restart new-platform-frontend'
+    ssh root@102.215.228.161 "cd ${APP_DIR} && npm run build && pm2 restart nextjs-app && systemctl restart nginx"
     exit 1
 }
 

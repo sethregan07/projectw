@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { useProposals, useCastVote, useCreateProposal, WalletIntegration, blockchainService } from "@/lib/blockchain"
+import { useProposals, useCastVote, useCreateProposal, WalletIntegration, blockchainService, GovernanceProposal } from "@/lib/blockchain"
 
 export default function ProposalsPageWired() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -75,7 +75,7 @@ export default function ProposalsPageWired() {
     }
   }
 
-  const filteredProposals = proposals?.filter(p => {
+  const filteredProposals = proposals?.filter((p: GovernanceProposal) => {
     const matchesFilter = filter === "all" || p.status === filter
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          p.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -203,7 +203,7 @@ export default function ProposalsPageWired() {
         {/* Proposals List */}
         {!proposalsLoading && (
           <div className="space-y-6">
-            {filteredProposals.map((proposal) => (
+            {filteredProposals.map((proposal: GovernanceProposal) => (
               <Card key={proposal.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between mb-3">
