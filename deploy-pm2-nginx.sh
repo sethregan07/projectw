@@ -129,6 +129,15 @@ else
     log_warning "Application health check failed - may take longer to start"
 fi
 
+# Deploy Docker services
+log_info "🐳 Deploying Docker services..."
+if [ -f "backend/docker/deploy-vps-docker.sh" ]; then
+    chmod +x backend/docker/deploy-vps-docker.sh
+    ./backend/docker/deploy-vps-docker.sh
+else
+    log_warning "Docker deployment script not found - skipping Docker deployment"
+fi
+
 # Display status
 log_info "📊 Deployment Status:"
 pm2 list
@@ -136,16 +145,23 @@ pm2 monit | head -20
 
 log_success "🎉 Deployment completed!"
 log_info ""
-log_info "🌐 Application is accessible at:"
-log_info "   • http://${VPS_IP}"
-log_info "   • http://${VPS_IP}/health"
+log_info "🌐 Applications accessible at:"
+log_info "   • Frontend: http://${VPS_IP}"
+log_info "   • Frontend Health: http://${VPS_IP}/health"
+log_info "   • API Gateway: http://${VPS_IP}:3000"
+log_info "   • Auth Service: http://${VPS_IP}:3001"
+log_info "   • Ghost CMS: http://${VPS_IP}:2368"
 log_info ""
 log_info "📋 Management commands:"
-log_info "   • View logs: pm2 logs"
-log_info "   • Restart app: pm2 restart ${APP_NAME}"
-log_info "   • Monitor: pm2 monit"
+log_info "   • Frontend logs: pm2 logs"
+log_info "   • Restart frontend: pm2 restart ${APP_NAME}"
+log_info "   • Monitor frontend: pm2 monit"
 log_info "   • Nginx status: systemctl status nginx"
+log_info "   • Docker status: docker ps"
+log_info "   • Docker logs: docker logs <service-name>"
+log_info "   • Stop Docker: docker compose -f backend/docker/docker-compose.minimal.yml down"
 log_info ""
 log_info "🔧 Configuration files:"
 log_info "   • PM2 config: ${APP_DIR}/ecosystem.config.js"
 log_info "   • Nginx config: /etc/nginx/sites-available/app.conf"
+log_info "   • Docker compose: ${APP_DIR}/backend/docker/docker-compose.minimal.yml"

@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Forward POST request to auth service
-    const response = await fetch('http://localhost:3001/api/users/change-password', {
+    const response = await fetch('http://102.215.228.243:3001/api/users/change-password', {
       method: 'POST',
       headers: {
         'Authorization': request.headers.get('authorization') || '',

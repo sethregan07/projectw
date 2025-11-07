@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Forward GET request to auth service
-    const response = await fetch('http://localhost:3001/api/users/profile', {
+    const response = await fetch('http://102.215.228.243:3001/api/users/profile', {
       method: 'GET',
       headers: {
         'Authorization': request.headers.get('authorization') || '',
@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // Forward PUT request to auth service
-    const response = await fetch('http://localhost:3001/api/users/profile', {
+    const response = await fetch('http://102.215.228.243:3001/api/users/profile', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${request.headers.get('authorization')}`,

@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Forward the request to the auth service
-    const response = await fetch('http://localhost:3001/api/auth/register', {
+    const response = await fetch('http://102.215.228.243:3001/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

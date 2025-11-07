@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use ed25519_dalek::{Keypair, PublicKey, SecretKey, Signature};
+use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, Verifier};
 use sha3::{Sha3_256, Digest};
 use rand::rngs::OsRng;
 use x25519_dalek::{EphemeralSecret, PublicKey as X25519PublicKey};
@@ -12,7 +12,7 @@ use hex;
 struct IdentityClaim {
     claim_type: String,
     claim_value: Vec<u8>,
-    issuer: PublicKey,
+    issuer: VerifyingKey,
     signature: Signature,
     zero_knowledge_proof: Vec<u8>,
 }
@@ -20,7 +20,7 @@ struct IdentityClaim {
 #[derive(Debug)]
 struct DecentralizedIdentity {
     did: Vec<u8>,
-    signing_keypair: Keypair,
+    signing_keypair: SigningKey,
     encryption_keypair: X25519PublicKey,
     claims: Vec<IdentityClaim>,
     verified_peers: HashMap<String, bool>,
@@ -30,15 +30,15 @@ impl DecentralizedIdentity {
     // Create a new decentralized identity
     fn new() -> Self {
         let mut csprng = OsRng;
-        let signing_keypair: Keypair = Keypair::generate(&mut csprng);
-        
+        let signing_keypair: SigningKey = SigningKey::generate(&mut csprng);
+
         // Generate X25519 key for encryption
-        let encryption_secret = EphemeralSecret::new(&mut csprng);
+        let encryption_secret = EphemeralSecret::random_from_rng(&mut csprng);
         let encryption_public = X25519PublicKey::from(&encryption_secret);
 
         // Generate Decentralized Identifier (DID)
         let mut hasher = Sha3_256::new();
-        hasher.update(signing_keypair.public.to_bytes());
+        hasher.update(signing_keypair.verifying_key().as_bytes());
         let did = hasher.finalize().to_vec();
 
         DecentralizedIdentity {
@@ -63,13 +63,13 @@ impl DecentralizedIdentity {
         // Generate zero-knowledge proof (simplified)
         let mut zk_hasher = Sha3_256::new();
         zk_hasher.update(&message);
-        zk_hasher.update(self.signing_keypair.public.to_bytes());
+        zk_hasher.update(self.signing_keypair.verifying_key().as_bytes());
         let zk_proof = zk_hasher.finalize().to_vec();
 
         let claim = IdentityClaim {
             claim_type,
             claim_value,
-            issuer: self.signing_keypair.public,
+            issuer: self.signing_keypair.verifying_key(),
             signature,
             zero_knowledge_proof: zk_proof,
         };
@@ -91,17 +91,17 @@ impl DecentralizedIdentity {
 
     // Encrypt message for a specific recipient
     fn encrypt_message(
-        &self, 
-        recipient_public_key: &X25519PublicKey, 
+        &self,
+        recipient_public_key: &X25519PublicKey,
         message: &[u8]
     ) -> Vec<u8> {
         // Use X25519 ECDH for key exchange and encryption
         let mut csprng = OsRng;
-        let ephemeral_secret = EphemeralSecret::new(&mut csprng);
-        
+        let ephemeral_secret = EphemeralSecret::random_from_rng(&mut csprng);
+
         // Perform key exchange
         let shared_secret = ephemeral_secret.diffie_hellman(recipient_public_key);
-        
+
         // Use shared secret to derive encryption key (simplified)
         let mut hasher = Sha3_256::new();
         hasher.update(shared_secret.as_bytes());
@@ -116,16 +116,16 @@ impl DecentralizedIdentity {
 
     // Decrypt message
     fn decrypt_message(
-        &self, 
-        sender_public_key: &X25519PublicKey, 
+        &self,
+        sender_public_key: &X25519PublicKey,
         encrypted_message: &[u8]
     ) -> Option<Vec<u8>> {
         // Perform key exchange
         let mut csprng = OsRng;
-        let ephemeral_secret = EphemeralSecret::new(&mut csprng);
-        
+        let ephemeral_secret = EphemeralSecret::random_from_rng(&mut csprng);
+
         let shared_secret = ephemeral_secret.diffie_hellman(sender_public_key);
-        
+
         // Derive decryption key
         let mut hasher = Sha3_256::new();
         hasher.update(shared_secret.as_bytes());
@@ -141,16 +141,16 @@ impl DecentralizedIdentity {
     }
 
     // Verify peer identity
-    fn verify_peer(&mut self, peer_public_key: PublicKey) -> bool {
+    fn verify_peer(&mut self, peer_public_key: VerifyingKey) -> bool {
         // Simplified peer verification
         let is_verified = self.verify_claim_from_peer(&peer_public_key);
-        let key = hex::encode(peer_public_key.to_bytes());
+        let key = hex::encode(peer_public_key.as_bytes());
         self.verified_peers.insert(key, is_verified);
         is_verified
     }
 
     // Placeholder for more complex peer verification
-    fn verify_claim_from_peer(&self, _peer_public_key: &PublicKey) -> bool {
+    fn verify_claim_from_peer(&self, _peer_public_key: &VerifyingKey) -> bool {
         // In a real system, this would involve more complex verification
         true
     }

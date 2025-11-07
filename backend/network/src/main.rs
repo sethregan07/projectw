@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use ed25519_dalek::{Keypair, PublicKey, SecretKey, Signature};
+use ed25519_dalek::{SigningKey, VerifyingKey, Signature};
 use x25519_dalek::{EphemeralSecret, PublicKey as X25519PublicKey};
 use sha3::{Sha3_256, Digest};
 use rand::rngs::OsRng;
@@ -8,7 +8,8 @@ use aes_gcm::{
     Key,
     Nonce
 };
-use aes_gcm::aead::{Aead, NewAead};
+use aes_gcm::aead::{Aead};
+use aes_gcm::KeyInit;
 use hex;
 
 // End-to-End Encrypted Communication
@@ -16,7 +17,7 @@ use hex;
 
 #[derive(Clone, Debug)]
 struct EncryptedMessage {
-    sender: PublicKey,
+    sender: VerifyingKey,
     recipient: Vec<u8>,
     ciphertext: Vec<u8>,
     nonce: Vec<u8>,
@@ -24,7 +25,7 @@ struct EncryptedMessage {
 }
 
 struct SecureCommunicationNode {
-    signing_keypair: Keypair,
+    signing_keypair: SigningKey,
     encryption_keypair: X25519PublicKey,
     message_history: HashMap<String, Vec<EncryptedMessage>>,
     trusted_peers: HashMap<String, bool>,
@@ -34,10 +35,10 @@ impl SecureCommunicationNode {
     // Create a new secure communication node
     fn new() -> Self {
         let mut csprng = OsRng;
-        let signing_keypair: Keypair = Keypair::generate(&mut csprng);
-        
+        let signing_keypair: SigningKey = SigningKey::generate(&mut csprng);
+
         // Generate X25519 key for encryption
-        let encryption_secret = EphemeralSecret::new(&mut csprng);
+        let encryption_secret = EphemeralSecret::random_from_rng(&mut csprng);
         let encryption_public = X25519PublicKey::from(&encryption_secret);
 
         SecureCommunicationNode {
@@ -55,33 +56,33 @@ impl SecureCommunicationNode {
         message: &[u8]
     ) -> EncryptedMessage {
         let mut csprng = OsRng;
-        
+
         // Generate ephemeral key for this transmission
-        let ephemeral_secret = EphemeralSecret::new(&mut csprng);
+        let ephemeral_secret = EphemeralSecret::random_from_rng(&mut csprng);
         let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-        
+
         // Perform key exchange
         let shared_secret = ephemeral_secret.diffie_hellman(recipient_public_key);
-        
+
         // Derive encryption key
         let mut hasher = Sha3_256::new();
         hasher.update(shared_secret.as_bytes());
         let derived_key = hasher.finalize();
-        
+
         // Use AES-GCM for encryption
-        let key = Key::from_slice(&derived_key);
+        let key = Key::<Aes256Gcm>::from_slice(&derived_key);
         let cipher = Aes256Gcm::new(key);
-        
+
         // Generate unique nonce
         let nonce = Nonce::from_slice(&shared_secret.as_bytes()[..12]);
-        
+
         // Encrypt the message
         let ciphertext = cipher.encrypt(nonce, message)
             .expect("Encryption failed");
-        
+
         EncryptedMessage {
-            sender: self.signing_keypair.public,
-            recipient: recipient_public_key.to_bytes(),
+            sender: self.signing_keypair.verifying_key(),
+            recipient: recipient_public_key.to_bytes().to_vec(),
             ciphertext,
             nonce: nonce.to_vec(),
             ephemeral_public_key: ephemeral_public,
@@ -94,43 +95,43 @@ impl SecureCommunicationNode {
         encrypted_message: &EncryptedMessage
     ) -> Option<Vec<u8>> {
         // Verify sender is trusted
-        if !self.is_trusted_peer(&encrypted_message.sender) {
+        if !self.is_trusted_peer(encrypted_message.sender.clone()) {
             return None;
         }
 
         // Perform key exchange using our secret key
         let mut csprng = OsRng;
-        let our_secret = EphemeralSecret::new(&mut csprng);
-        
+        let our_secret = EphemeralSecret::random_from_rng(&mut csprng);
+
         let shared_secret = our_secret.diffie_hellman(&encrypted_message.ephemeral_public_key);
-        
+
         // Derive decryption key
         let mut hasher = Sha3_256::new();
         hasher.update(shared_secret.as_bytes());
         let derived_key = hasher.finalize();
-        
+
         // Use AES-GCM for decryption
-        let key = Key::from_slice(&derived_key);
+        let key = Key::<Aes256Gcm>::from_slice(&derived_key);
         let cipher = Aes256Gcm::new(key);
-        
+
         // Use the nonce from the original message
         let nonce = Nonce::from_slice(&encrypted_message.nonce);
-        
+
         // Attempt decryption
         cipher.decrypt(nonce, encrypted_message.ciphertext.as_ref())
             .ok()
     }
 
     // Add a peer to trusted list
-    fn add_trusted_peer(&mut self, peer_public_key: PublicKey) {
+    fn add_trusted_peer(&mut self, peer_public_key: VerifyingKey) {
         // In a real system, this would involve more complex verification
-        let key = hex::encode(peer_public_key.to_bytes());
+        let key = hex::encode(peer_public_key.as_bytes());
         self.trusted_peers.insert(key, true);
     }
 
     // Check if a peer is trusted
-    fn is_trusted_peer(&self, peer_public_key: PublicKey) -> bool {
-        let key = hex::encode(peer_public_key.to_bytes());
+    fn is_trusted_peer(&self, peer_public_key: VerifyingKey) -> bool {
+        let key = hex::encode(peer_public_key.as_bytes());
         self.trusted_peers.get(&key).cloned().unwrap_or(false)
     }
 
@@ -160,8 +161,8 @@ fn main() {
     let mut bob = SecureCommunicationNode::new();
 
     // Add each other as trusted peers
-    alice.add_trusted_peer(bob.signing_keypair.public);
-    bob.add_trusted_peer(alice.signing_keypair.public);
+    alice.add_trusted_peer(bob.signing_keypair.verifying_key());
+    bob.add_trusted_peer(alice.signing_keypair.verifying_key());
 
     // Send a secret message
     let secret_message = b"Hello, this is a top-secret message!";

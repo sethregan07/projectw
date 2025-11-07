@@ -4,7 +4,7 @@ services:
   # API Gateway - Entry point for all services
   api-gateway:
     build:
-      context: ./backend/microservices/api-gateway
+      context: ../microservices/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
     restart: unless-stopped
@@ -52,7 +52,7 @@ services:
     depends_on:
       - database-service
     volumes:
-      - ./backend/microservices/auth-service/logs:/usr/src/app/logs
+      - ../microservices/auth-service/logs:/usr/src/app/logs
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
       interval: 30s
@@ -135,7 +135,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./backend/microservices/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../microservices/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
       - microservices-network
@@ -157,7 +157,7 @@ services:
     restart: unless-stopped
     user: root
     volumes:
-      - ./backend/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - microservices-network

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     // Try to connect to the auth service health endpoint
-    const response = await fetch('http://localhost:3001/health', {
+    const response = await fetch('http://102.215.228.243:3001/health', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
