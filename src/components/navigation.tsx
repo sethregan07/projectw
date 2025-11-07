@@ -152,18 +152,18 @@ const Navigation = () => {
                   </Link>
 
                   <Link
-                    href="/features/voting"
+                    href="/features/healthcare"
                     className="group block p-3 rounded-md hover:bg-muted transition-colors"
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-md group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors">
-                        <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-md group-hover:bg-red-100 dark:group-hover:bg-red-900/30 transition-colors">
+                        <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                       </div>
-                      <h3 className="font-semibold text-foreground">Voting Systems</h3>
+                      <h3 className="font-semibold text-foreground">Healthcare</h3>
                     </div>
-                    <p className="text-xs text-muted-foreground">Advanced voting mechanisms</p>
+                    <p className="text-xs text-muted-foreground">Medical services & wellness</p>
                   </Link>
 
                   <Link
@@ -396,19 +396,19 @@ const Navigation = () => {
                     </Link>
 
                     <Link
-                      href="/features/voting"
+                      href="/features/healthcare"
                       className="block p-3 rounded-lg hover:bg-muted transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
-                          <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-md">
+                          <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                         </div>
                         <div>
-                          <div className="font-medium">Voting Systems</div>
-                          <div className="text-xs text-muted-foreground">Advanced voting mechanisms</div>
+                          <div className="font-medium">Healthcare</div>
+                          <div className="text-xs text-muted-foreground">Medical services & wellness</div>
                         </div>
                       </div>
                     </Link>

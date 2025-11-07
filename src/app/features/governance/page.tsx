@@ -12,6 +12,15 @@ export default function GovernancePage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [showCreateProposal, setShowCreateProposal] = useState(false)
   const [votedProposals, setVotedProposals] = useState<Record<number, 'for' | 'against'>>({})
+  const [quadraticVotes, setQuadraticVotes] = useState<Record<string, number>>({
+    optionA: 0,
+    optionB: 0,
+    optionC: 0
+  })
+  const [convictionVotes, setConvictionVotes] = useState<Record<string, { votes: number, time: number }>>({
+    proposal1: { votes: 0, time: 1 },
+    proposal2: { votes: 0, time: 1 }
+  })
 
   const [proposalForm, setProposalForm] = useState({
     title: "",
@@ -500,6 +509,347 @@ export default function GovernancePage() {
                       <p className="text-xs font-mono text-muted-foreground">
                         Vote Power = Token Balance
                       </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Interactive Voting Demos */}
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-4">Try Voting Systems</h3>
+                  <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Experience different voting mechanisms through interactive demonstrations
+                  </p>
+                </div>
+
+                {/* Quadratic Voting Demo */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quadratic Voting Demo</CardTitle>
+                    <CardDescription>Express preference intensity using quadratic voting</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold">Option A: Reforestation</h4>
+                        <p className="text-sm text-muted-foreground">Plant 1 million trees in deforested areas</p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = Math.max(0, (quadraticVotes?.optionA || 0) - 1)
+                              setQuadraticVotes(prev => ({ ...prev, optionA: newVotes }))
+                            }}
+                            disabled={(quadraticVotes?.optionA || 0) <= 0}
+                          >
+                            -
+                          </Button>
+                          <span className="font-mono text-lg min-w-[2rem] text-center">{quadraticVotes?.optionA || 0}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = (quadraticVotes?.optionA || 0) + 1
+                              setQuadraticVotes(prev => ({ ...prev, optionA: newVotes }))
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Cost: {((quadraticVotes?.optionA || 0) * (quadraticVotes?.optionA || 0))} credits
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="font-semibold">Option B: Clean Energy</h4>
+                        <p className="text-sm text-muted-foreground">Fund solar panel installation in rural areas</p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = Math.max(0, (quadraticVotes?.optionB || 0) - 1)
+                              setQuadraticVotes(prev => ({ ...prev, optionB: newVotes }))
+                            }}
+                            disabled={(quadraticVotes?.optionB || 0) <= 0}
+                          >
+                            -
+                          </Button>
+                          <span className="font-mono text-lg min-w-[2rem] text-center">{quadraticVotes?.optionB || 0}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = (quadraticVotes?.optionB || 0) + 1
+                              setQuadraticVotes(prev => ({ ...prev, optionB: newVotes }))
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Cost: {((quadraticVotes?.optionB || 0) * (quadraticVotes?.optionB || 0))} credits
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="font-semibold">Option C: Ocean Cleanup</h4>
+                        <p className="text-sm text-muted-foreground">Deploy autonomous cleanup vessels</p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = Math.max(0, (quadraticVotes?.optionC || 0) - 1)
+                              setQuadraticVotes(prev => ({ ...prev, optionC: newVotes }))
+                            }}
+                            disabled={(quadraticVotes?.optionC || 0) <= 0}
+                          >
+                            -
+                          </Button>
+                          <span className="font-mono text-lg min-w-[2rem] text-center">{quadraticVotes?.optionC || 0}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const newVotes = (quadraticVotes?.optionC || 0) + 1
+                              setQuadraticVotes(prev => ({ ...prev, optionC: newVotes }))
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Cost: {((quadraticVotes?.optionC || 0) * (quadraticVotes?.optionC || 0))} credits
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-semibold">Total Voting Credits Used:</span>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {Object.values(quadraticVotes || {}).reduce((sum, votes) => sum + (votes * votes), 0)}
+                        </span>
+                      </div>
+                      <div className="bg-muted p-4 rounded-lg">
+                        <h4 className="font-semibold mb-2">How Quadratic Voting Works:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Each additional vote costs exponentially more (vote strength squared)</li>
+                          <li>• Strong preferences can be expressed, but at high cost</li>
+                          <li>• Prevents single individuals from dominating decisions</li>
+                          <li>• Encourages compromise and broad consensus</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Conviction Voting Demo */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Conviction Voting Demo</CardTitle>
+                    <CardDescription>Experience time-locked voting power</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold">Proposal 1: Community Garden Initiative</h4>
+                        <p className="text-sm text-muted-foreground">Establish community gardens in urban areas</p>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Vote Strength (0-10)</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="10"
+                            value={convictionVotes?.proposal1?.votes || 0}
+                            onChange={(e) => {
+                              const votes = parseInt(e.target.value)
+                              const time = convictionVotes?.proposal1?.time || 1
+                              setConvictionVotes(prev => ({
+                                ...prev,
+                                proposal1: { votes, time }
+                              }))
+                            }}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>0</span>
+                            <span>Current: {convictionVotes?.proposal1?.votes || 0}</span>
+                            <span>10</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Time Commitment (days)</label>
+                          <input
+                            type="range"
+                            min="1"
+                            max="30"
+                            value={convictionVotes?.proposal1?.time || 1}
+                            onChange={(e) => {
+                              const time = parseInt(e.target.value)
+                              const votes = convictionVotes?.proposal1?.votes || 0
+                              setConvictionVotes(prev => ({
+                                ...prev,
+                                proposal1: { votes, time }
+                              }))
+                            }}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>1</span>
+                            <span>Current: {convictionVotes?.proposal1?.time || 1}</span>
+                            <span>30</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                          <div className="text-sm">
+                            <span className="font-semibold">Conviction Power: </span>
+                            <span className="font-mono text-blue-600 dark:text-blue-400">
+                              {((convictionVotes?.proposal1?.votes || 0) * Math.sqrt((convictionVotes?.proposal1?.time || 1) + 1)).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="font-semibold">Proposal 2: Digital Education Platform</h4>
+                        <p className="text-sm text-muted-foreground">Create free online learning resources</p>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Vote Strength (0-10)</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="10"
+                            value={convictionVotes?.proposal2?.votes || 0}
+                            onChange={(e) => {
+                              const votes = parseInt(e.target.value)
+                              const time = convictionVotes?.proposal2?.time || 1
+                              setConvictionVotes(prev => ({
+                                ...prev,
+                                proposal2: { votes, time }
+                              }))
+                            }}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>0</span>
+                            <span>Current: {convictionVotes?.proposal2?.votes || 0}</span>
+                            <span>10</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Time Commitment (days)</label>
+                          <input
+                            type="range"
+                            min="1"
+                            max="30"
+                            value={convictionVotes?.proposal2?.time || 1}
+                            onChange={(e) => {
+                              const time = parseInt(e.target.value)
+                              const votes = convictionVotes?.proposal2?.votes || 0
+                              setConvictionVotes(prev => ({
+                                ...prev,
+                                proposal2: { votes, time }
+                              }))
+                            }}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>1</span>
+                            <span>Current: {convictionVotes?.proposal2?.time || 1}</span>
+                            <span>30</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                          <div className="text-sm">
+                            <span className="font-semibold">Conviction Power: </span>
+                            <span className="font-mono text-green-600 dark:text-green-400">
+                              {((convictionVotes?.proposal2?.votes || 0) * Math.sqrt((convictionVotes?.proposal2?.time || 1) + 1)).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-muted p-4 rounded-lg">
+                      <h4 className="font-semibold mb-2">How Conviction Voting Works:</h4>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Conviction = Vote × √(Time + 1)
+                      </p>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• Voting power grows with both vote strength and time commitment</li>
+                        <li>• Rewards long-term thinking and sustained participation</li>
+                        <li>• Reduces impulsive decisions and encourages thoughtful governance</li>
+                        <li>• Builds community commitment to important initiatives</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Voting System Comparison */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Voting System Comparison</CardTitle>
+                    <CardDescription>Compare different voting mechanisms</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse border border-border rounded-lg">
+                        <thead>
+                          <tr className="bg-muted">
+                            <th className="border border-border p-4 text-left font-semibold">Aspect</th>
+                            <th className="border border-border p-4 text-center font-semibold">Quadratic</th>
+                            <th className="border border-border p-4 text-center font-semibold">Conviction</th>
+                            <th className="border border-border p-4 text-center font-semibold">1P1V</th>
+                            <th className="border border-border p-4 text-center font-semibold">Token Weighted</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="border border-border p-4 font-medium">Fairness</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★☆</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                            <td className="border border-border p-4 text-center text-red-600">★★☆☆☆</td>
+                          </tr>
+                          <tr className="bg-muted/50">
+                            <td className="border border-border p-4 font-medium">Complexity</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-border p-4 font-medium">Long-term Thinking</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                          </tr>
+                          <tr className="bg-muted/50">
+                            <td className="border border-border p-4 font-medium">Speed of Decision</td>
+                            <td className="border border-border p-4 text-center text-orange-600">★★★☆☆</td>
+                            <td className="border border-border p-4 text-center text-red-600">★★☆☆☆</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                            <td className="border border-border p-4 text-center text-green-600">★★★★★</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-border p-4 font-medium">Best For</td>
+                            <td className="border border-border p-4 text-center text-xs">Preference intensity</td>
+                            <td className="border border-border p-4 text-center text-xs">Long-term impact</td>
+                            <td className="border border-border p-4 text-center text-xs">Clear binary choices</td>
+                            <td className="border border-border p-4 text-center text-xs">Token value decisions</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </CardContent>
                 </Card>
