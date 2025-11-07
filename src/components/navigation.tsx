@@ -268,6 +268,12 @@ const Navigation = () => {
             Learn
           </Link>
           <Link
+            href="/updates"
+            className="transition-colors hover:text-foreground/80 text-foreground font-medium"
+          >
+            Updates
+          </Link>
+          <Link
             href="/about"
             className="transition-colors hover:text-foreground/80 text-foreground font-medium"
           >
@@ -524,6 +530,13 @@ const Navigation = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Learn
+              </Link>
+              <Link
+                href="/updates"
+                className="block p-3 rounded-lg hover:bg-muted transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Updates
               </Link>
               <Link
                 href="/about"

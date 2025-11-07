@@ -159,8 +159,10 @@ export default function LearnPage() {
                     <span>{path.duration}</span>
                   </div>
                   <Badge variant="secondary">{path.level}</Badge>
-                  <Button variant="outline" className="w-full mt-2">
-                    Start Learning
+                  <Button variant="outline" className="w-full mt-2" asChild>
+                    <Link href={`/learn/courses/${path.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                      Start Learning
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
