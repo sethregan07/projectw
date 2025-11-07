@@ -12,32 +12,32 @@ export default function HealthcarePage() {
 
   const healthcareServices = [
     {
-      id: "telemedicine",
-      title: "Telemedicine",
-      description: "24/7 virtual consultations with licensed healthcare professionals",
-      icon: "📱",
-      features: ["Video consultations", "Prescription delivery", "Follow-up care", "Emergency support"]
+      id: "naturopathic-telemedicine",
+      title: "Naturopathic Telemedicine",
+      description: "Natural healing consultations through virtual platforms combining traditional wisdom with modern technology",
+      icon: "🌿",
+      features: ["Virtual naturopathic consultations", "Herbal remedy guidance", "Dietary therapy plans", "Lifestyle coaching"]
     },
     {
-      id: "preventive",
-      title: "Preventive Care",
-      description: "Comprehensive wellness programs and health screenings",
-      icon: "🛡️",
-      features: ["Annual checkups", "Vaccinations", "Health screenings", "Wellness coaching"]
+      id: "preventive-nutrition",
+      title: "Preventive Nutrition & Wellness",
+      description: "Self-sufficient health through natural nutrition and preventive practices",
+      icon: "🥗",
+      features: ["Personalized nutrition plans", "Herbal medicine education", "Detoxification programs", "Immune system strengthening"]
     },
     {
-      id: "emergency",
-      title: "Emergency Services",
-      description: "Rapid response emergency medical services and coordination",
-      icon: "🚑",
-      features: ["24/7 emergency line", "Ambulance dispatch", "Hospital coordination", "Medical evacuation"]
+      id: "holistic-healing",
+      title: "Holistic Healing Centers",
+      description: "Community-based natural healing centers for comprehensive wellness support",
+      icon: "🏞️",
+      features: ["Acupuncture & acupressure", "Herbal dispensaries", "Meditation & yoga spaces", "Community health workshops"]
     },
     {
-      id: "specialized",
-      title: "Specialized Care",
-      description: "Access to specialists and advanced medical treatments",
-      icon: "🏥",
-      features: ["Specialist referrals", "Advanced diagnostics", "Treatment coordination", "Second opinions"]
+      id: "self-sufficient-health",
+      title: "Self-Sufficient Health Education",
+      description: "Empowering citizens with knowledge for independent natural healthcare",
+      icon: "📚",
+      features: ["Natural remedy libraries", "Home remedy workshops", "Herbal gardening programs", "Preventive health education"]
     }
   ]
 
@@ -92,10 +92,10 @@ export default function HealthcarePage() {
       <div className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-8 py-16">
           <div className="max-w-4xl">
-            <h1 className="text-5xl font-bold text-foreground mb-6">Healthcare & Wellness</h1>
+            <h1 className="text-5xl font-bold text-foreground mb-6">Naturopathic Healthcare & Wellness</h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Comprehensive healthcare services designed for our network state's citizens.
-              From preventive care to emergency services, we ensure your health and wellness are prioritized.
+              Empowering citizens with natural, preventive healthcare through naturopathy and telemedicine.
+              Focus on self-sufficient wellness, herbal medicine, and holistic healing practices for optimal health.
             </p>
             <div className="flex gap-4">
               <Button size="lg">Schedule Consultation</Button>
@@ -121,15 +121,15 @@ export default function HealthcarePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg w-fit mx-auto mb-3">
-                    <span className="text-2xl">❤️</span>
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg w-fit mx-auto mb-3">
+                    <span className="text-2xl">🌿</span>
                   </div>
-                  <CardTitle className="text-lg">Primary Care</CardTitle>
-                  <CardDescription>Comprehensive primary healthcare services</CardDescription>
+                  <CardTitle className="text-lg">Naturopathic Care</CardTitle>
+                  <CardDescription>Natural healing through traditional wisdom</CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-sm text-muted-foreground">
-                    Routine checkups, preventive care, and chronic disease management
+                    Herbal medicine, dietary therapy, and natural healing practices
                   </p>
                 </CardContent>
               </Card>
@@ -137,29 +137,29 @@ export default function HealthcarePage() {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg w-fit mx-auto mb-3">
-                    <span className="text-2xl">🩺</span>
+                    <span className="text-2xl">📱</span>
                   </div>
-                  <CardTitle className="text-lg">Specialized Care</CardTitle>
-                  <CardDescription>Expert medical specialists and treatments</CardDescription>
+                  <CardTitle className="text-lg">Telemedicine</CardTitle>
+                  <CardDescription>Virtual consultations with naturopathic experts</CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-sm text-muted-foreground">
-                    Access to specialists across all medical disciplines
+                    Remote access to natural healthcare professionals and guidance
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
-                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg w-fit mx-auto mb-3">
-                    <span className="text-2xl">🏃‍♂️</span>
+                  <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg w-fit mx-auto mb-3">
+                    <span className="text-2xl">🥗</span>
                   </div>
-                  <CardTitle className="text-lg">Wellness Programs</CardTitle>
-                  <CardDescription>Holistic health and wellness initiatives</CardDescription>
+                  <CardTitle className="text-lg">Preventive Nutrition</CardTitle>
+                  <CardDescription>Self-sufficient health through natural nutrition</CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-sm text-muted-foreground">
-                    Mental health, fitness, nutrition, and lifestyle programs
+                    Personalized nutrition plans and immune system strengthening
                   </p>
                 </CardContent>
               </Card>
@@ -167,14 +167,14 @@ export default function HealthcarePage() {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
                   <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg w-fit mx-auto mb-3">
-                    <span className="text-2xl">🚑</span>
+                    <span className="text-2xl">📚</span>
                   </div>
-                  <CardTitle className="text-lg">Emergency Care</CardTitle>
-                  <CardDescription>24/7 emergency medical services</CardDescription>
+                  <CardTitle className="text-lg">Health Education</CardTitle>
+                  <CardDescription>Empowering self-sufficient healthcare knowledge</CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-sm text-muted-foreground">
-                    Rapid response emergency care and medical coordination
+                    Natural remedy libraries and preventive health education
                   </p>
                 </CardContent>
               </Card>
@@ -188,24 +188,24 @@ export default function HealthcarePage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-semibold">Preventive First</h4>
-                      <p className="text-sm text-muted-foreground">We prioritize prevention and early intervention to maintain optimal health.</p>
+                      <h4 className="font-semibold">Natural Healing</h4>
+                      <p className="text-sm text-muted-foreground">Emphasizing naturopathic principles, herbal medicine, and natural remedies for optimal health.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-semibold">Accessible Care</h4>
-                      <p className="text-sm text-muted-foreground">Healthcare should be accessible to all citizens regardless of location or circumstances.</p>
+                      <h4 className="font-semibold">Self-Sufficient Wellness</h4>
+                      <p className="text-sm text-muted-foreground">Empowering citizens with knowledge and tools for independent natural healthcare practices.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-semibold">Holistic Wellness</h4>
-                      <p className="text-sm text-muted-foreground">We address physical, mental, and emotional health as interconnected aspects of wellness.</p>
+                      <h4 className="font-semibold">Prevention & Education</h4>
+                      <p className="text-sm text-muted-foreground">Focus on preventive care through nutrition, lifestyle, and comprehensive health education.</p>
                     </div>
                   </div>
                 </CardContent>

@@ -21,6 +21,49 @@ interface Release {
 export default function UpdatesPage() {
   const releases: Release[] = [
     {
+      version: "v1.3.0",
+      date: "November 2025",
+      title: "Community & Collaboration Enhancement",
+      description: "Major information architecture restructuring with integrated collaboration features and authentication-gated content",
+      updates: [
+        {
+          type: "feature",
+          title: "Unified Community Center",
+          description: "Integrated Community Hub functionality into Community Center with social and collaborative features"
+        },
+        {
+          type: "feature",
+          title: "Authentication-Gated Collaboration",
+          description: "Projects, Team Finder, Solutions, and Initiatives tabs require login for deeper engagement"
+        },
+        {
+          type: "improvement",
+          title: "Progressive Disclosure UX",
+          description: "Public access to discussions and events, with login prompts for advanced collaboration features"
+        },
+        {
+          type: "feature",
+          title: "Healthcare Feature System",
+          description: "Comprehensive healthcare platform with telemedicine, preventive care, and wellness services"
+        },
+        {
+          type: "improvement",
+          title: "Governance System Enhancement",
+          description: "Integrated voting demos and content into Governance page with interactive proposal system"
+        },
+        {
+          type: "improvement",
+          title: "Navigation Streamlining",
+          description: "Cleaned up navigation by removing redundant Community Center link, accessible via Features dropdown"
+        },
+        {
+          type: "feature",
+          title: "Cross-Linking Architecture",
+          description: "Bidirectional navigation between Community Center and Governance Dashboard for better user flow"
+        }
+      ]
+    },
+    {
       version: "v1.2.0",
       date: "November 2025",
       title: "Learning Platform Launch",
@@ -28,7 +71,7 @@ export default function UpdatesPage() {
       updates: [
         {
           type: "feature",
-          title: "Udemy-Style Course System",
+          title: "Documention System",
           description: "Complete learning platform with 4 comprehensive courses covering network state fundamentals"
         },
         {
@@ -145,9 +188,9 @@ export default function UpdatesPage() {
               Stay up to date with the latest features, improvements, and content additions to our Network State platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/learn">
+              <Link href="/features/community">
                 <Badge variant="secondary" className="px-4 py-2 cursor-pointer hover:bg-white/20">
-                  🆕 Latest: Learning Platform v1.2.0
+                  🆕 Latest: Community & Collaboration v1.3.0
                 </Badge>
               </Link>
             </div>

@@ -191,9 +191,9 @@ const Navigation = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                       </div>
-                      <h3 className="font-semibold text-foreground">Community</h3>
+                      <h3 className="font-semibold text-foreground">Community Center</h3>
                     </div>
-                    <p className="text-xs text-muted-foreground">Discussion & collaboration tools</p>
+                    <p className="text-xs text-muted-foreground">Social community & events</p>
                   </Link>
 
                   <Link
@@ -285,6 +285,7 @@ const Navigation = () => {
           >
             Dashboard
           </Link>
+
         </nav>
 
         {/* Right side buttons */}
@@ -443,8 +444,8 @@ const Navigation = () => {
                           </svg>
                         </div>
                         <div>
-                          <div className="font-medium">Community</div>
-                          <div className="text-xs text-muted-foreground">Discussion & collaboration tools</div>
+                          <div className="font-medium">Community Center</div>
+                          <div className="text-xs text-muted-foreground">Social community & events</div>
                         </div>
                       </div>
                     </Link>
@@ -552,6 +553,7 @@ const Navigation = () => {
               >
                 Dashboard
               </Link>
+
             </nav>
 
             {/* Mobile Action Buttons */}
