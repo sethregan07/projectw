@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { verifyNewsletterSubscription } from "@/lib/newsletter"
 
-export default function NewsletterVerifyPage() {
+function NewsletterVerifyContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
@@ -97,5 +97,27 @@ export default function NewsletterVerifyPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function NewsletterVerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Verifying Your Subscription</CardTitle>
+            <CardDescription>Please wait while we verify your email address...</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <NewsletterVerifyContent />
+    </Suspense>
   )
 }

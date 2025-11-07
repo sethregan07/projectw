@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
-export default function NewsletterWelcomePage() {
+function NewsletterWelcomeContent() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
 
@@ -186,5 +186,17 @@ export default function NewsletterWelcomePage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function NewsletterWelcomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <NewsletterWelcomeContent />
+    </Suspense>
   )
 }
