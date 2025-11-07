@@ -730,6 +730,205 @@ app.get('/api/auth/methods', (req, res) => {
   });
 });
 
+/**
+ * Newsletter Subscription System
+ */
+
+// Initialize newsletter database table
+async function initializeNewsletterTable() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        subscription_status VARCHAR(50) DEFAULT 'pending',
+        verification_token VARCHAR(255) UNIQUE,
+        verified_at TIMESTAMP,
+        subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        unsubscribed_at TIMESTAMP,
+        preferences JSONB DEFAULT '{}',
+        ip_address INET,
+        user_agent TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers(email);
+      CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscribers(subscription_status);
+      CREATE INDEX IF NOT EXISTS idx_newsletter_token ON newsletter_subscribers(verification_token);
+      CREATE INDEX IF NOT EXISTS idx_newsletter_verified ON newsletter_subscribers(verified_at);
+
+      CREATE OR REPLACE FUNCTION update_updated_at_column()
+      RETURNS TRIGGER AS $$
+      BEGIN
+          NEW.updated_at = CURRENT_TIMESTAMP;
+          RETURN NEW;
+      END;
+      $$ language 'plpgsql';
+
+      DROP TRIGGER IF EXISTS update_newsletter_subscribers_updated_at ON newsletter_subscribers;
+      CREATE TRIGGER update_newsletter_subscribers_updated_at
+          BEFORE UPDATE ON newsletter_subscribers
+          FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    `);
+    console.log('Newsletter database initialized successfully');
+  } catch (err) {
+    console.error('Error initializing newsletter database:', err);
+  } finally {
+    client.release();
+  }
+}
+
+// Newsletter subscription endpoint
+app.post('/api/newsletter/subscribe', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  // Basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Invalid email format' });
+  }
+
+  try {
+    // Check if email is already subscribed
+    const existingSubscriber = await pool.query(
+      'SELECT * FROM newsletter_subscribers WHERE email = $1',
+      [email.toLowerCase()]
+    );
+
+    if (existingSubscriber.rows.length > 0) {
+      const subscriber = existingSubscriber.rows[0];
+      if (subscriber.subscription_status === 'active') {
+        return res.status(409).json({ message: 'Email is already subscribed to our newsletter' });
+      } else if (subscriber.subscription_status === 'pending') {
+        return res.status(409).json({ message: 'Email subscription is pending verification. Please check your email.' });
+      }
+    }
+
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    // Create or update subscriber
+    const result = await pool.query(`
+      INSERT INTO newsletter_subscribers (email, verification_token, ip_address, user_agent)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (email)
+      DO UPDATE SET
+        verification_token = EXCLUDED.verification_token,
+        subscription_status = 'pending',
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `, [email.toLowerCase(), verificationToken, req.ip, req.get('User-Agent')]);
+
+    const subscriber = result.rows[0];
+
+    // TODO: Send verification email
+    // For now, just return success with verification URL
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/verify?token=${verificationToken}`;
+
+    console.log(`Newsletter subscription for ${email}: ${verificationUrl}`);
+
+    res.status(201).json({
+      message: 'Subscription request received. Please check your email to verify your subscription.',
+      verificationUrl: process.env.NODE_ENV === 'development' ? verificationUrl : undefined
+    });
+  } catch (err) {
+    console.error('Newsletter subscription error:', err);
+    res.status(500).json({ message: 'Server error during subscription' });
+  }
+});
+
+// Newsletter verification endpoint
+app.get('/api/newsletter/verify/:token', async (req, res) => {
+  const { token } = req.params;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Verification token is required' });
+  }
+
+  try {
+    // Find subscriber by token
+    const result = await pool.query(
+      'SELECT * FROM newsletter_subscribers WHERE verification_token = $1 AND subscription_status = $2',
+      [token, 'pending']
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Invalid or expired verification token' });
+    }
+
+    const subscriber = result.rows[0];
+
+    // Update subscriber status
+    await pool.query(
+      'UPDATE newsletter_subscribers SET subscription_status = $1, verified_at = CURRENT_TIMESTAMP, verification_token = NULL WHERE id = $2',
+      ['active', subscriber.id]
+    );
+
+    // Redirect to welcome page
+    const welcomeUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/welcome?email=${encodeURIComponent(subscriber.email)}`;
+    res.redirect(welcomeUrl);
+  } catch (err) {
+    console.error('Newsletter verification error:', err);
+    res.status(500).json({ message: 'Server error during verification' });
+  }
+});
+
+// Newsletter unsubscribe endpoint
+app.post('/api/newsletter/unsubscribe', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE newsletter_subscribers SET subscription_status = $1, unsubscribed_at = CURRENT_TIMESTAMP WHERE email = $2 AND subscription_status = $3 RETURNING *',
+      ['unsubscribed', email.toLowerCase(), 'active']
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Active subscription not found for this email' });
+    }
+
+    res.json({ message: 'Successfully unsubscribed from newsletter' });
+  } catch (err) {
+    console.error('Newsletter unsubscribe error:', err);
+    res.status(500).json({ message: 'Server error during unsubscription' });
+  }
+});
+
+// Get newsletter subscriber status (for authenticated users)
+app.get('/api/newsletter/status', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT email, subscription_status, subscribed_at, verified_at FROM newsletter_subscribers WHERE email = $1',
+      [req.user.email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ subscribed: false });
+    }
+
+    const subscriber = result.rows[0];
+    res.json({
+      subscribed: subscriber.subscription_status === 'active',
+      status: subscriber.subscription_status,
+      subscribedAt: subscriber.subscribed_at,
+      verifiedAt: subscriber.verified_at
+    });
+  } catch (err) {
+    console.error('Newsletter status error:', err);
+    res.status(500).json({ message: 'Server error fetching subscription status' });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'auth-service' });
@@ -739,6 +938,7 @@ app.get('/health', (req, res) => {
 app.listen(PORT, async () => {
   console.log(`Auth service running on port ${PORT}`);
   await initializeDatabase();
+  await initializeNewsletterTable();
 });
 
 module.exports = app; // For testing

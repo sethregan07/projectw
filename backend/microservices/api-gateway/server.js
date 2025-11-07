@@ -145,6 +145,27 @@ app.use('/api/ghost', (req, res, next) => {
   });
 });
 
+// Newsletter routes (public subscription, authenticated status)
+app.use('/api/newsletter', (req, res, next) => {
+  // Public routes
+  if (req.path === '/subscribe' || req.path.startsWith('/verify/') || req.path === '/unsubscribe') {
+    return createProxyMiddleware({
+      ...proxyOptions,
+      target: AUTH_SERVICE_URL,
+      pathRewrite: { '^/api/newsletter': '/api/newsletter' }
+    })(req, res, next);
+  }
+
+  // Authenticated routes
+  authenticateToken(req, res, () => {
+    createProxyMiddleware({
+      ...proxyOptions,
+      target: AUTH_SERVICE_URL,
+      pathRewrite: { '^/api/newsletter': '/api/newsletter' }
+    })(req, res, next);
+  });
+});
+
 // Mautic routes (require authentication)
 app.use('/api/mautic', authenticateToken, createProxyMiddleware({
   ...proxyOptions,

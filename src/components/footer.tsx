@@ -1,8 +1,45 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { subscribeToNewsletter } from "@/lib/newsletter"
 
 export default function Footer() {
+  const [email, setEmail] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("")
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!email.trim()) {
+      setMessage("Please enter your email address")
+      setMessageType("error")
+      return
+    }
+
+    setIsLoading(true)
+    setMessage("")
+
+    try {
+      const response = await subscribeToNewsletter(email.trim())
+      setMessage(response.message)
+      setMessageType("success")
+      setEmail("")
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setMessage("")
+        setMessageType("")
+      }, 5000)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to subscribe. Please try again.")
+      setMessageType("error")
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <footer className="border-t border-border/40 bg-gradient-to-br from-background via-muted/30 to-background">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -74,16 +111,28 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-foreground mb-2">Stay Updated</h3>
             <p className="text-sm text-muted-foreground">Subscribe to our newsletter for the latest updates</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <Input
               type="email"
               placeholder="Enter your email"
               className="flex-1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
-            <Button className="bg-blue-600 hover:bg-blue-700 rounded-sm">
-              Subscribe
+            <Button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 rounded-sm"
+              disabled={isLoading}
+            >
+              {isLoading ? "Subscribing..." : "Subscribe"}
             </Button>
-          </div>
+          </form>
+          {message && (
+            <div className={`mt-4 text-center text-sm ${messageType === "success" ? "text-green-600" : "text-red-600"}`}>
+              {message}
+            </div>
+          )}
         </div>
 
         <div className="mt-12 pt-8 border-t border-border/40">
