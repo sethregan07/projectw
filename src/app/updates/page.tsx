@@ -21,39 +21,6 @@ interface Release {
 export default function UpdatesPage() {
   const releases: Release[] = [
     {
-      version: "v1.3.1",
-      date: "January 2026",
-      title: "Newsletter & Proposals Integration",
-      description: "Added comprehensive newsletter subscription system and proposals management features with enhanced backend services",
-      updates: [
-        {
-          type: "feature",
-          title: "Newsletter Subscription System",
-          description: "Complete newsletter subscription with email verification, welcome flows, and subscription management"
-        },
-        {
-          type: "feature",
-          title: "Proposals API and Dashboard",
-          description: "New proposals management system with API endpoints and dashboard integration for governance"
-        },
-        {
-          type: "improvement",
-          title: "Enhanced Learn Courses",
-          description: "Updated governance and getting-started courses with improved content and user experience"
-        },
-        {
-          type: "improvement",
-          title: "Backend Microservices Updates",
-          description: "Enhanced API gateway, auth service, and database configurations for better performance"
-        },
-        {
-          type: "improvement",
-          title: "Deployment and Infrastructure",
-          description: "Updated deployment scripts, Docker configurations, and VPS setup tools"
-        }
-      ]
-    },
-    {
       version: "v1.3.0",
       date: "November 2025",
       title: "Community & Collaboration Enhancement",
@@ -214,16 +181,16 @@ export default function UpdatesPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
             <Badge className="mb-4">Updates</Badge>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-black dark:text-white mb-6">
               Platform Updates
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-800 dark:text-white/90 max-w-3xl mx-auto mb-8">
               Stay up to date with the latest features, improvements, and content additions to our Network State platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="/features/community">
                 <Badge variant="secondary" className="px-4 py-2 cursor-pointer hover:bg-white/20">
-                  🆕 Latest: Newsletter & Proposals v1.3.1
+                  🆕 Latest: Community & Collaboration v1.3.0
                 </Badge>
               </Link>
             </div>
@@ -404,10 +371,10 @@ export default function UpdatesPage() {
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-600 dark:to-indigo-600">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
             Stay Updated
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-slate-900/90 dark:text-white/90 mb-8">
             Follow our development progress and get notified about new releases
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

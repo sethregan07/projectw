@@ -99,10 +99,10 @@ export default function LearnPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
             <Badge className="mb-4">Knowledge Center</Badge>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-black dark:text-white mb-6">
               Network State Knowledge Center
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-800 dark:text-white/90 max-w-3xl mx-auto mb-8">
               Everything you need to build, grow, and govern your network state. From fundamentals to advanced strategies.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto">
@@ -385,17 +385,17 @@ export default function LearnPage() {
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-600 dark:to-indigo-600">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
             Contribute to Network State Knowledge
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-slate-900/90 dark:text-white/90 mb-8">
             Share your expertise and help others build successful network states
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-white/90">
               Submit an Article
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+            <Button size="lg" variant="outline" className="border-slate-900 text-slate-900 dark:border-white dark:text-white hover:bg-white/10">
               Join Community
             </Button>
           </div>
