@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - GHOST_SERVICE_URL=http://ghost-service:2368
+      - MAUTIC_SERVICE_URL=http://mautic-service:8000
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - ghost-service
+      - mautic-service
+    volumes:
+      - ./logs:/usr/src/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Reference to other services
+  auth-service:
+    extends:
+      file: ../auth-service/docker-compose.yml
+      service: auth-service
+    networks:
+      - microservices-network
+
+  ghost-service:
+    extends:
+      file: ../ghost-service/docker-compose.yml
+      service: ghost-service
+    networks:
+      - microservices-network
+
+  mautic-service:
+    extends:
+      file: ../mautic-service/docker-compose.yml
+      service: mautic-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+    name: microservices-network
+    external: true

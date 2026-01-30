@@ -5,104 +5,141 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { getAuthToken } from "@/lib/authService"
+import { Textarea } from "@/components/ui/textarea"
+
+interface Proposal {
+  id: number;
+  title: string;
+  description: string;
+  author: string;
+  category: string;
+  status: string;
+  votesFor: number;
+  votesAgainst: number;
+  totalVotes: number;
+  quorum: number;
+  fundingRequested: string;
+  created: string;
+  votingStart?: string;
+  votingEnd?: string;
+  timeLeft?: string;
+}
 
 export default function ProposalsPage() {
   const [filter, setFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [newProposal, setNewProposal] = useState({
+    title: '',
+    description: '',
+    category: '',
+    fundingRequested: '',
+    quorum: 100
+  })
 
-  const proposals = [
-    {
-      id: 1,
-      title: "Establish Network State Healthcare System",
-      author: "Dr. Sarah Chen",
-      category: "Healthcare",
-      status: "active",
-      votesFor: 2450,
-      votesAgainst: 340,
-      totalVotes: 2790,
-      quorum: 3000,
-      timeLeft: "2 days",
-      description: "Proposal to create a decentralized healthcare network with telemedicine infrastructure, health data sovereignty, and cross-border access for all network state citizens.",
-      fundingRequested: "500,000 LLD",
-      created: "2024-01-10",
-    },
-    {
-      id: 2,
-      title: "Treasury Diversification Strategy",
-      author: "Marcus Johnson",
-      category: "Treasury",
-      status: "active",
-      votesFor: 1890,
-      votesAgainst: 210,
-      totalVotes: 2100,
-      quorum: 3000,
-      timeLeft: "5 days",
-      description: "Diversify treasury holdings across multiple assets including stablecoins, ETH, and real-world assets to reduce risk and ensure long-term sustainability.",
-      fundingRequested: "N/A",
-      created: "2024-01-12",
-    },
-    {
-      id: 3,
-      title: "Implement Quadratic Voting for Major Decisions",
-      author: "Elena Popov",
-      category: "Governance",
-      status: "pending",
-      votesFor: 0,
-      votesAgainst: 0,
-      totalVotes: 0,
-      quorum: 3000,
-      timeLeft: "7 days",
-      description: "Transition from simple majority voting to quadratic voting for proposals requesting over 100,000 LLD to ensure more democratic outcomes.",
-      fundingRequested: "50,000 LLD",
-      created: "2024-01-14",
-    },
-    {
-      id: 4,
-      title: "Launch Community Media Platform",
-      author: "Alex Rivera",
-      category: "Media",
-      status: "passed",
-      votesFor: 3200,
-      votesAgainst: 450,
-      totalVotes: 3650,
-      quorum: 3000,
-      timeLeft: "Ended",
-      description: "Create a decentralized media platform for community storytelling, cultural discourse, and content publishing with built-in monetization.",
-      fundingRequested: "250,000 LLD",
-      created: "2024-01-05",
-    },
-    {
-      id: 5,
-      title: "Establish Physical Embassy in Dubai",
-      author: "Network State Council",
-      category: "Expansion",
-      status: "active",
-      votesFor: 2100,
-      votesAgainst: 890,
-      totalVotes: 2990,
-      quorum: 3000,
-      timeLeft: "1 day",
-      description: "Secure physical presence with an embassy/co-working space in Dubai to facilitate real-world coordination and diplomatic recognition.",
-      fundingRequested: "1,000,000 LLD",
-      created: "2024-01-08",
-    },
-    {
-      id: 6,
-      title: "Network State Census and Metrics Dashboard",
-      author: "Data Analytics Team",
-      category: "Infrastructure",
-      status: "pending",
-      votesFor: 0,
-      votesAgainst: 0,
-      totalVotes: 0,
-      quorum: 3000,
-      timeLeft: "10 days",
-      description: "Build comprehensive census system to track population, economic activity, and key metrics for diplomatic recognition.",
-      fundingRequested: "75,000 LLD",
-      created: "2024-01-15",
-    },
-  ]
+  useEffect(() => {
+    fetchProposals()
+  }, [])
+
+  const fetchProposals = async () => {
+    try {
+      const response = await fetch('/api/proposals')
+      if (!response.ok) {
+        throw new Error('Failed to fetch proposals')
+      }
+      const data = await response.json()
+      // Add timeLeft based on status
+      const proposalsWithTimeLeft = data.map((p: Proposal) => ({
+        ...p,
+        timeLeft: p.status === 'active' ? 'Active' : p.status === 'pending' ? 'Pending' : 'Ended'
+      }))
+      setProposals(proposalsWithTimeLeft)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load proposals')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVote = async (proposalId: number, vote: 'for' | 'against') => {
+    const token = getAuthToken()
+    if (!token) {
+      alert('Please login to vote')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/proposals/${proposalId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ vote }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to cast vote')
+      }
+
+      // Refresh proposals after voting
+      await fetchProposals()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to cast vote')
+    }
+  }
+
+  const handleCreateProposal = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const token = getAuthToken()
+    if (!token) {
+      alert('Please login to create a proposal')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/proposals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(newProposal),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to create proposal')
+      }
+
+      // Reset form and refresh proposals
+      setNewProposal({
+        title: '',
+        description: '',
+        category: '',
+        fundingRequested: '',
+        quorum: 100
+      })
+      setShowCreateForm(false)
+      await fetchProposals()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to create proposal')
+    }
+  }
+
+  if (loading) {
+    return <div className="min-h-screen bg-background flex items-center justify-center">Loading proposals...</div>
+  }
+
+  if (error) {
+    return <div className="min-h-screen bg-background flex items-center justify-center text-red-500">{error}</div>
+  }
 
   const filteredProposals = proposals.filter(p => {
     const matchesFilter = filter === "all" || p.status === filter
@@ -138,6 +175,71 @@ export default function ProposalsPage() {
           <h1 className="text-4xl font-bold text-foreground mb-2">All Proposals</h1>
           <p className="text-muted-foreground">Review, vote, and track all network state proposals</p>
         </div>
+
+        {/* Create Proposal Button */}
+        <div className="mb-8">
+          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+            {showCreateForm ? 'Cancel' : 'Create New Proposal'}
+          </Button>
+        </div>
+
+        {/* Create Proposal Form */}
+        {showCreateForm && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Create New Proposal</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreateProposal} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Title</label>
+                  <Input
+                    value={newProposal.title}
+                    onChange={(e) => setNewProposal({...newProposal, title: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <Textarea
+                    value={newProposal.description}
+                    onChange={(e) => setNewProposal({...newProposal, description: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Category</label>
+                    <Input
+                      value={newProposal.category}
+                      onChange={(e) => setNewProposal({...newProposal, category: e.target.value})}
+                      placeholder="e.g., Healthcare, Treasury"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Funding Requested (LLD)</label>
+                    <Input
+                      type="number"
+                      value={newProposal.fundingRequested}
+                      onChange={(e) => setNewProposal({...newProposal, fundingRequested: e.target.value})}
+                      placeholder="e.g., 50000"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Quorum</label>
+                    <Input
+                      type="number"
+                      value={newProposal.quorum}
+                      onChange={(e) => setNewProposal({...newProposal, quorum: parseInt(e.target.value) || 100})}
+                      min="1"
+                    />
+                  </div>
+                </div>
+                <Button type="submit">Create Proposal</Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Filters and Search */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -247,13 +349,19 @@ export default function ProposalsPage() {
 
                     {proposal.status === "active" && (
                       <div className="flex gap-3 pt-2">
-                        <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleVote(proposal.id, 'for')}
+                        >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           Vote For
                         </Button>
-                        <Button className="flex-1 bg-red-600 hover:bg-red-700">
+                        <Button
+                          className="flex-1 bg-red-600 hover:bg-red-700"
+                          onClick={() => handleVote(proposal.id, 'against')}
+                        >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>

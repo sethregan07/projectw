@@ -75,9 +75,8 @@ APP_DIR="/var/www/${APP_NAME}"
 log_info "Setting up app directory: ${APP_DIR}"
 mkdir -p "$APP_DIR"
 
-# Copy application files
-log_info "Copying application files..."
-cp -r . "$APP_DIR" || log_error "Failed to copy application files"
+# Copy application files (Git-based deployment - files are already pulled)
+log_info "Application files are already updated via Git pull..."
 
 # Navigate to app directory
 cd "$APP_DIR"

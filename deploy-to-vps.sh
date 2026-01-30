@@ -25,12 +25,15 @@ echo ""
 # Step 2: Sync to VPS
 echo "2️⃣ Syncing to VPS..."
 APP_DIR="/var/www/nextjs-app"
-rsync -avz --quiet --delete --exclude='.git' --exclude='.next' --exclude='node_modules' . root@102.215.228.243:"${APP_DIR}/" || {
-    echo "   rsync failed, using alternative sync method..."
-    # Alternative: tar + scp fallback
-    tar czf /tmp/new-platform-local.tar.gz --exclude='.git' --exclude='.next' --exclude='node_modules' .
-    scp /tmp/new-platform-local.tar.gz root@102.215.228.243:/tmp/
-    ssh root@102.215.228.243 "mkdir -p ${APP_DIR} && cd /tmp && tar xzf new-platform-local.tar.gz && cp -r * ${APP_DIR}/ && rm new-platform-local.tar.gz"
+ssh root@102.215.228.243 "cd ${APP_DIR} && git config --global --add safe.directory ${APP_DIR} && git pull origin main" || {
+    echo "   Git pull failed, using rsync fallback..."
+    rsync -avz --quiet --delete --exclude='.git' --exclude='.next' --exclude='node_modules' . root@102.215.228.243:"${APP_DIR}/" || {
+        echo "   rsync failed, using alternative sync method..."
+        # Alternative: tar + scp fallback
+        tar czf /tmp/new-platform-local.tar.gz --exclude='.git' --exclude='.next' --exclude='node_modules' .
+        scp /tmp/new-platform-local.tar.gz root@102.215.228.243:/tmp/
+        ssh root@102.215.228.243 "mkdir -p ${APP_DIR} && cd /tmp && tar xzf new-platform-local.tar.gz && cp -r * ${APP_DIR}/ && rm new-platform-local.tar.gz"
+    }
 }
 
 echo "✅ Code transfer completed"

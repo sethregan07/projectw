@@ -31,117 +31,153 @@ export default function GovernanceCourse() {
       duration: "10 min",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder
       content: `
-# Direct Democracy
+<h1>👥&nbsp;Direct Democracy</h1>
 
-## What is Direct Democracy?
+<h2>❓&nbsp;What is Direct Democracy?</h2>
 
-Direct democracy is a system where citizens participate directly in decision-making rather than electing representatives to make decisions on their behalf. Every member of the community has an equal vote on all issues.
+<p>Direct democracy is a system where citizens participate directly in decision-making rather than electing representatives to make decisions on their behalf. Every member of the community has an equal vote on all issues.</p>
 
-## Key Characteristics
+<h2>🔑&nbsp;Key Characteristics</h2>
 
-### 1. Universal Participation
-- Every eligible member can vote on every issue
-- No intermediaries between citizens and decisions
-- Equal voting power for all participants
+<h3>🌐&nbsp;1. Universal Participation</h3>
+<ul>
+<li>Every eligible member can vote on every issue</li>
+<li>No intermediaries between citizens and decisions</li>
+<li>Equal voting power for all participants</li>
+</ul>
 
-### 2. Real-time Decision Making
-- Decisions can be made as issues arise
-- No waiting for representative terms to expire
-- Immediate response to community needs
+<h3>⚡&nbsp;2. Real-time Decision Making</h3>
+<ul>
+<li>Decisions can be made as issues arise</li>
+<li>No waiting for representative terms to expire</li>
+<li>Immediate response to community needs</li>
+</ul>
 
-### 3. Transparency
-- All votes are public and auditable
-- Decision processes are visible to all
-- No behind-the-scenes negotiations
+<h3>🔍&nbsp;3. Transparency</h3>
+<ul>
+<li>All votes are public and auditable</li>
+<li>Decision processes are visible to all</li>
+<li>No behind-the-scenes negotiations</li>
+</ul>
 
-## Advantages
+<h2>✅&nbsp;Advantages</h2>
 
-### High Legitimacy
-- Decisions reflect the direct will of the people
-- No concerns about representative capture
-- Strong democratic legitimacy
+<h3>🏆&nbsp;High Legitimacy</h3>
+<ul>
+<li>Decisions reflect the direct will of the people</li>
+<li>No concerns about representative capture</li>
+<li>Strong democratic legitimacy</li>
+</ul>
 
-### Citizen Engagement
-- Encourages active participation
-- Builds community awareness
-- Strengthens social bonds
+<h3>🤝&nbsp;Citizen Engagement</h3>
+<ul>
+<li>Encourages active participation</li>
+<li>Builds community awareness</li>
+<li>Strengthens social bonds</li>
+</ul>
 
-### Rapid Response
-- Quick decisions on urgent matters
-- Adaptable to changing circumstances
-- No bureaucratic delays
+<h3>🚀&nbsp;Rapid Response</h3>
+<ul>
+<li>Quick decisions on urgent matters</li>
+<li>Adaptable to changing circumstances</li>
+<li>No bureaucratic delays</li>
+</ul>
 
-## Challenges
+<h2>⚠️&nbsp;Challenges</h2>
 
-### Scalability Issues
-- Difficult to implement in large communities
-- Time-consuming for frequent decisions
-- Information overload for participants
+<h3>📏&nbsp;Scalability Issues</h3>
+<ul>
+<li>Difficult to implement in large communities</li>
+<li>Time-consuming for frequent decisions</li>
+<li>Information overload for participants</li>
+</ul>
 
-### Expertise Requirements
-- Citizens need knowledge of complex issues
-- Risk of uninformed decision-making
-- Potential for emotional rather than rational choices
+<h3>🎓&nbsp;Expertise Requirements</h3>
+<ul>
+<li>Citizens need knowledge of complex issues</li>
+<li>Risk of uninformed decision-making</li>
+<li>Potential for emotional rather than rational choices</li>
+</ul>
 
-### Participation Fatigue
-- Constant voting can lead to apathy
-- Not all members will participate actively
-- Risk of decision-making by vocal minorities
+<h3>😴&nbsp;Participation Fatigue</h3>
+<ul>
+<li>Constant voting can lead to apathy</li>
+<li>Not all members will participate actively</li>
+<li>Risk of decision-making by vocal minorities</li>
+</ul>
 
-## Implementation in Network States
+<h2>🛠️&nbsp;Implementation in Network States</h2>
 
-### Digital Tools
-- Online voting platforms
-- Real-time polling systems
-- Blockchain-based immutable records
+<h3>💻&nbsp;Digital Tools</h3>
+<ul>
+<li>Online voting platforms</li>
+<li>Real-time polling systems</li>
+<li>Blockchain-based immutable records</li>
+</ul>
 
-### Process Design
-- Clear voting procedures
-- Defined decision thresholds
-- Appeal mechanisms for contested decisions
+<h3>📋&nbsp;Process Design</h3>
+<ul>
+<li>Clear voting procedures</li>
+<li>Defined decision thresholds</li>
+<li>Appeal mechanisms for contested decisions</li>
+</ul>
 
-### Education and Support
-- Voter education programs
-- Decision support tools
-- Expert advisory panels
+<h3>🎓&nbsp;Education and Support</h3>
+<ul>
+<li>Voter education programs</li>
+<li>Decision support tools</li>
+<li>Expert advisory panels</li>
+</ul>
 
-## Case Studies
+<h2>📚&nbsp;Case Studies</h2>
 
-### Ancient Athens
-- Birthplace of direct democracy
-- Citizens voted directly on laws and policies
-- Limited to free male citizens
+<h3>🏛️&nbsp;Ancient Athens</h3>
+<ul>
+<li>Birthplace of direct democracy</li>
+<li>Citizens voted directly on laws and policies</li>
+<li>Limited to free male citizens</li>
+</ul>
 
-### Swiss Cantons
-- Regular referendums on policy issues
-- Citizen-initiated legislation
-- High participation rates
+<h3>🇨🇭&nbsp;Swiss Cantons</h3>
+<ul>
+<li>Regular referendums on policy issues</li>
+<li>Citizen-initiated legislation</li>
+<li>High participation rates</li>
+</ul>
 
-### Modern Examples
-- Some Swiss cantons still use direct democracy
-- Digital direct democracy experiments
-- Corporate governance in some organizations
+<h3>🌐&nbsp;Modern Examples</h3>
+<ul>
+<li>Some Swiss cantons still use direct democracy</li>
+<li>Digital direct democracy experiments</li>
+<li>Corporate governance in some organizations</li>
+</ul>
 
-## Best Practices
+<h2>💡&nbsp;Best Practices</h2>
 
-### Clear Rules
-- Well-defined voting procedures
-- Transparent counting methods
-- Dispute resolution processes
+<h3>📏&nbsp;Clear Rules</h3>
+<ul>
+<li>Well-defined voting procedures</li>
+<li>Transparent counting methods</li>
+<li>Dispute resolution processes</li>
+</ul>
 
-### Technology Support
-- User-friendly voting interfaces
-- Secure authentication systems
-- Real-time result tracking
+<h3>🛡️&nbsp;Technology Support</h3>
+<ul>
+<li>User-friendly voting interfaces</li>
+<li>Secure authentication systems</li>
+<li>Real-time result tracking</li>
+</ul>
 
-### Community Building
-- Education on governance processes
-- Regular community discussions
-- Building trust in the system
+<h3>👥&nbsp;Community Building</h3>
+<ul>
+<li>Education on governance processes</li>
+<li>Regular community discussions</li>
+<li>Building trust in the system</li>
+</ul>
 
-## Conclusion
+<h2>🏁&nbsp;Conclusion</h2>
 
-Direct democracy offers the highest level of citizen participation and democratic legitimacy, but requires careful implementation to address its scalability challenges. When properly designed and supported, it can create highly engaged and responsive communities.
+<p>Direct democracy offers the highest level of citizen participation and democratic legitimacy, but requires careful implementation to address its scalability challenges. When properly designed and supported, it can create highly engaged and responsive communities.</p>
       `,
       completed: false
     },
@@ -152,151 +188,199 @@ Direct democracy offers the highest level of citizen participation and democrati
       duration: "12 min",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder
       content: `
-# Representative Democracy
+<h1>🏛️&nbsp;Representative Democracy</h1>
 
-## What is Representative Democracy?
+<h2>❓&nbsp;What is Representative Democracy?</h2>
 
-Representative democracy is a system where citizens elect representatives to make decisions on their behalf. These representatives are accountable to their constituents and serve for defined terms.
+<p>Representative democracy is a system where citizens elect representatives to make decisions on their behalf. These representatives are accountable to their constituents and serve for defined terms.</p>
 
-## Key Characteristics
+<h2>🔑&nbsp;Key Characteristics</h2>
 
-### 1. Election Cycles
-- Regular elections for representatives
-- Defined terms of service
-- Accountability through re-election
+<h3>🗳️&nbsp;1. Election Cycles</h3>
+<ul>
+<li>Regular elections for representatives</li>
+<li>Defined terms of service</li>
+<li>Accountability through re-election</li>
+</ul>
 
-### 2. Specialization
-- Representatives can focus on governance
-- Allows for expertise in complex issues
-- Professional decision-making capacity
+<h3>🎯&nbsp;2. Specialization</h3>
+<ul>
+<li>Representatives can focus on governance</li>
+<li>Allows for expertise in complex issues</li>
+<li>Professional decision-making capacity</li>
+</ul>
 
-### 3. Stability
-- Consistent leadership over time
-- Predictable decision-making processes
-- Institutional memory preservation
+<h3>⚖️&nbsp;3. Stability</h3>
+<ul>
+<li>Consistent leadership over time</li>
+<li>Predictable decision-making processes</li>
+<li>Institutional memory preservation</li>
+</ul>
 
-## Advantages
+<h2>✅&nbsp;Advantages</h2>
 
-### Scalability
-- Works well for large communities
-- Efficient decision-making processes
-- Allows for complex policy development
+<h3>📏&nbsp;Scalability</h3>
+<ul>
+<li>Works well for large communities</li>
+<li>Efficient decision-making processes</li>
+<li>Allows for complex policy development</li>
+</ul>
 
-### Expertise
-- Representatives can develop deep knowledge
-- Professional governance capabilities
-- Specialized committee structures
+<h3>🎓&nbsp;Expertise</h3>
+<ul>
+<li>Representatives can develop deep knowledge</li>
+<li>Professional governance capabilities</li>
+<li>Specialized committee structures</li>
+</ul>
 
-### Stability
-- Consistent policies over time
-- Reduced political volatility
-- Long-term planning capabilities
+<h3>🏗️&nbsp;Stability</h3>
+<ul>
+<li>Consistent policies over time</li>
+<li>Reduced political volatility</li>
+<li>Long-term planning capabilities</li>
+</ul>
 
-## Challenges
+<h2>⚠️&nbsp;Challenges</h2>
 
-### Representation Gaps
-- Representatives may not reflect constituent views
-- Potential for elite capture
-- Geographic or demographic biases
+<h3>🔄&nbsp;Representation Gaps</h3>
+<ul>
+<li>Representatives may not reflect constituent views</li>
+<li>Potential for elite capture</li>
+<li>Geographic or demographic biases</li>
+</ul>
 
-### Accountability Issues
-- Representatives may prioritize personal interests
-- Limited direct citizen control
-- Information asymmetry problems
+<h3>📊&nbsp;Accountability Issues</h3>
+<ul>
+<li>Representatives may prioritize personal interests</li>
+<li>Limited direct citizen control</li>
+<li>Information asymmetry problems</li>
+</ul>
 
-### Responsiveness
-- Slower response to changing conditions
-- Bureaucratic decision-making
-- Potential for institutional inertia
+<h3>⏱️&nbsp;Responsiveness</h3>
+<ul>
+<li>Slower response to changing conditions</li>
+<li>Bureaucratic decision-making</li>
+<li>Potential for institutional inertia</li>
+</ul>
 
-## Implementation in Network States
+<h2>🛠️&nbsp;Implementation in Network States</h2>
 
-### Election Systems
-- Ranked choice voting
-- Proportional representation
-- Approval voting methods
+<h3>🗳️&nbsp;Election Systems</h3>
+<ul>
+<li>Ranked choice voting</li>
+<li>Proportional representation</li>
+<li>Approval voting methods</li>
+</ul>
 
-### Term Limits
-- Maximum service periods
-- Rotation of leadership roles
-- Prevention of long-term entrenchment
+<h3>⏰&nbsp;Term Limits</h3>
+<ul>
+<li>Maximum service periods</li>
+<li>Rotation of leadership roles</li>
+<li>Prevention of long-term entrenchment</li>
+</ul>
 
-### Recall Mechanisms
-- Citizen-initiated removal of representatives
-- Performance-based accountability
-- Regular confidence votes
+<h3>🔄&nbsp;Recall Mechanisms</h3>
+<ul>
+<li>Citizen-initiated removal of representatives</li>
+<li>Performance-based accountability</li>
+<li>Regular confidence votes</li>
+</ul>
 
-## Governance Structures
+<h2>🏛️&nbsp;Governance Structures</h2>
 
-### Legislative Bodies
-- Policy development and law-making
-- Budget approval and oversight
-- Regulatory framework creation
+<h3>📜&nbsp;Legislative Bodies</h3>
+<ul>
+<li>Policy development and law-making</li>
+<li>Budget approval and oversight</li>
+<li>Regulatory framework creation</li>
+</ul>
 
-### Executive Functions
-- Day-to-day administration
-- Policy implementation
-- Crisis management
+<h3>⚙️&nbsp;Executive Functions</h3>
+<ul>
+<li>Day-to-day administration</li>
+<li>Policy implementation</li>
+<li>Crisis management</li>
+</ul>
 
-### Judicial Systems
-- Dispute resolution
-- Constitutional interpretation
-- Rights protection
+<h3>⚖️&nbsp;Judicial Systems</h3>
+<ul>
+<li>Dispute resolution</li>
+<li>Constitutional interpretation</li>
+<li>Rights protection</li>
+</ul>
 
-## Modern Innovations
+<h2>🚀&nbsp;Modern Innovations</h2>
 
-### Liquid Democracy
-- Combination of direct and representative democracy
-- Citizens can delegate votes on specific issues
-- Flexible participation levels
+<h3>🌊&nbsp;Liquid Democracy</h3>
+<ul>
+<li>Combination of direct and representative democracy</li>
+<li>Citizens can delegate votes on specific issues</li>
+<li>Flexible participation levels</li>
+</ul>
 
-### Sortition
-- Random selection of representatives
-- Reduces elite capture risks
-- Ensures diverse representation
+<h3>🎲&nbsp;Sortition</h3>
+<ul>
+<li>Random selection of representatives</li>
+<li>Reduces elite capture risks</li>
+<li>Ensures diverse representation</li>
+</ul>
 
-### Blockchain Governance
-- Transparent voting records
-- Automated execution of decisions
-- Reduced administrative overhead
+<h3>⛓️&nbsp;Blockchain Governance</h3>
+<ul>
+<li>Transparent voting records</li>
+<li>Automated execution of decisions</li>
+<li>Reduced administrative overhead</li>
+</ul>
 
-## Best Practices
+<h2>💡&nbsp;Best Practices</h2>
 
-### Electoral Integrity
-- Secure and transparent voting systems
-- Independent election monitoring
-- Clear campaign finance rules
+<h3>🛡️&nbsp;Electoral Integrity</h3>
+<ul>
+<li>Secure and transparent voting systems</li>
+<li>Independent election monitoring</li>
+<li>Clear campaign finance rules</li>
+</ul>
 
-### Representative Training
-- Governance education programs
-- Policy analysis skills development
-- Ethical decision-making training
+<h3>🎓&nbsp;Representative Training</h3>
+<ul>
+<li>Governance education programs</li>
+<li>Policy analysis skills development</li>
+<li>Ethical decision-making training</li>
+</ul>
 
-### Citizen Engagement
-- Regular town halls and public meetings
-- Digital participation platforms
-- Feedback and consultation mechanisms
+<h3>🤝&nbsp;Citizen Engagement</h3>
+<ul>
+<li>Regular town halls and public meetings</li>
+<li>Digital participation platforms</li>
+<li>Feedback and consultation mechanisms</li>
+</ul>
 
-## Case Studies
+<h2>📚&nbsp;Case Studies</h2>
 
-### United States Congress
-- Bicameral legislature
-- Complex committee system
-- Regular election cycles
+<h3>🇺🇸&nbsp;United States Congress</h3>
+<ul>
+<li>Bicameral legislature</li>
+<li>Complex committee system</li>
+<li>Regular election cycles</li>
+</ul>
 
-### Nordic Parliamentary Systems
-- Proportional representation
-- Coalition governments
-- Strong social welfare focus
+<h3>🇳🇴&nbsp;Nordic Parliamentary Systems</h3>
+<ul>
+<li>Proportional representation</li>
+<li>Coalition governments</li>
+<li>Strong social welfare focus</li>
+</ul>
 
-### Corporate Boards
-- Shareholder elections
-- Executive compensation oversight
-- Strategic direction setting
+<h3>🏢&nbsp;Corporate Boards</h3>
+<ul>
+<li>Shareholder elections</li>
+<li>Executive compensation oversight</li>
+<li>Strategic direction setting</li>
+</ul>
 
-## Conclusion
+<h2>🏁&nbsp;Conclusion</h2>
 
-Representative democracy provides efficient and scalable governance for growing network states, but requires strong accountability mechanisms and citizen engagement to maintain legitimacy and effectiveness.
+<p>Representative democracy provides efficient and scalable governance for growing network states, but requires strong accountability mechanisms and citizen engagement to maintain legitimacy and effectiveness.</p>
       `,
       completed: false
     },
@@ -307,185 +391,245 @@ Representative democracy provides efficient and scalable governance for growing 
       duration: "15 min",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder
       content: `
-# Liquid Democracy
+<h1>🌊&nbsp;Liquid Democracy</h1>
 
-## What is Liquid Democracy?
+<h2>❓&nbsp;What is Liquid Democracy?</h2>
 
-Liquid democracy is a governance system that combines elements of direct democracy and representative democracy. Citizens can vote directly on issues or delegate their voting power to trusted representatives on specific topics.
+<p>Liquid democracy is a governance system that combines elements of direct democracy and representative democracy. Citizens can vote directly on issues or delegate their voting power to trusted representatives on specific topics.</p>
 
-## Key Characteristics
+<h2>🔑&nbsp;Key Characteristics</h2>
 
-### 1. Flexible Participation
-- Citizens choose their level of involvement
-- Can vote directly or delegate authority
-- Dynamic participation based on interest and expertise
+<h3>🔄&nbsp;1. Flexible Participation</h3>
+<ul>
+<li>Citizens choose their level of involvement</li>
+<li>Can vote directly or delegate authority</li>
+<li>Dynamic participation based on interest and expertise</li>
+</ul>
 
-### 2. Issue-Specific Delegation
-- Delegates chosen for specific topics
-- Can change delegations at any time
-- Granular control over representation
+<h3>🎯&nbsp;2. Issue-Specific Delegation</h3>
+<ul>
+<li>Delegates chosen for specific topics</li>
+<li>Can change delegations at any time</li>
+<li>Granular control over representation</li>
+</ul>
 
-### 3. Network Effects
-- Creates networks of trust and expertise
-- Emergent leadership based on demonstrated value
-- Adaptive governance structures
+<h3>🌐&nbsp;3. Network Effects</h3>
+<ul>
+<li>Creates networks of trust and expertise</li>
+<li>Emergent leadership based on demonstrated value</li>
+<li>Adaptive governance structures</li>
+</ul>
 
-## Advantages
+<h2>✅&nbsp;Advantages</h2>
 
-### Optimal Participation
-- Citizens participate at their preferred level
-- Experts can focus on complex issues
-- Reduces voter fatigue
+<h3>🎯&nbsp;Optimal Participation</h3>
+<ul>
+<li>Citizens participate at their preferred level</li>
+<li>Experts can focus on complex issues</li>
+<li>Reduces voter fatigue</li>
+</ul>
 
-### Expertise Utilization
-- Delegates can develop deep knowledge
-- Specialization in different policy areas
-- Quality decision-making
+<h3>🎓&nbsp;Expertise Utilization</h3>
+<ul>
+<li>Delegates can develop deep knowledge</li>
+<li>Specialization in different policy areas</li>
+<li>Quality decision-making</li>
+</ul>
 
-### Adaptability
-- Governance structures evolve with needs
-- Quick responses to changing conditions
-- Flexible organizational forms
+<h3>🔄&nbsp;Adaptability</h3>
+<ul>
+<li>Governance structures evolve with needs</li>
+<li>Quick responses to changing conditions</li>
+<li>Flexible organizational forms</li>
+</ul>
 
-## Challenges
+<h2>⚠️&nbsp;Challenges</h2>
 
-### Complexity
-- More complex than simple systems
-- Learning curve for participants
-- Technical implementation requirements
+<h3>🧩&nbsp;Complexity</h3>
+<ul>
+<li>More complex than simple systems</li>
+<li>Learning curve for participants</li>
+<li>Technical implementation requirements</li>
+</ul>
 
-### Delegation Chains
-- Potential for long delegation chains
-- Risk of circular delegations
-- Information flow challenges
+<h3>🔗&nbsp;Delegation Chains</h3>
+<ul>
+<li>Potential for long delegation chains</li>
+<li>Risk of circular delegations</li>
+<li>Information flow challenges</li>
+</ul>
 
-### Power Concentration
-- Popular delegates may accumulate influence
-- Risk of informal hierarchies
-- Potential for manipulation
+<h3>⚡&nbsp;Power Concentration</h3>
+<ul>
+<li>Popular delegates may accumulate influence</li>
+<li>Risk of informal hierarchies</li>
+<li>Potential for manipulation</li>
+</ul>
 
-## Implementation in Network States
+<h2>🛠️&nbsp;Implementation in Network States</h2>
 
-### Technical Infrastructure
-- Digital delegation platforms
-- Real-time voting systems
-- Transparent delegation tracking
+<h3>💻&nbsp;Technical Infrastructure</h3>
+<ul>
+<li>Digital delegation platforms</li>
+<li>Real-time voting systems</li>
+<li>Transparent delegation tracking</li>
+</ul>
 
-### User Interface Design
-- Intuitive delegation interfaces
-- Clear information about delegates
-- Easy participation options
+<h3>🎨&nbsp;User Interface Design</h3>
+<ul>
+<li>Intuitive delegation interfaces</li>
+<li>Clear information about delegates</li>
+<li>Easy participation options</li>
+</ul>
 
-### Trust Mechanisms
-- Delegate reputation systems
-- Transparent decision records
-- Accountability dashboards
+<h3>🔒&nbsp;Trust Mechanisms</h3>
+<ul>
+<li>Delegate reputation systems</li>
+<li>Transparent decision records</li>
+<li>Accountability dashboards</li>
+</ul>
 
-## Delegation Mechanisms
+<h2>🔄&nbsp;Delegation Mechanisms</h2>
 
-### Direct Delegation
-- Point-to-point trust relationships
-- Personal knowledge of delegates
-- Strong accountability
+<h3>👥&nbsp;Direct Delegation</h3>
+<ul>
+<li>Point-to-point trust relationships</li>
+<li>Personal knowledge of delegates</li>
+<li>Strong accountability</li>
+</ul>
 
-### Transitive Delegation
-- Delegates can sub-delegate authority
-- Creates networks of trust
-- More complex but more flexible
+<h3>🔀&nbsp;Transitive Delegation</h3>
+<ul>
+<li>Delegates can sub-delegate authority</li>
+<li>Creates networks of trust</li>
+<li>More complex but more flexible</li>
+</ul>
 
-### Issue-Based Delegation
-- Different delegates for different topics
-- Granular control over representation
-- Specialized expertise utilization
+<h3>🎯&nbsp;Issue-Based Delegation</h3>
+<ul>
+<li>Different delegates for different topics</li>
+<li>Granular control over representation</li>
+<li>Specialized expertise utilization</li>
+</ul>
 
-## Decision-Making Processes
+<h2>📋&nbsp;Decision-Making Processes</h2>
 
-### Voting Thresholds
-- Different requirements for different decision types
-- Quorum requirements for validity
-- Emergency decision procedures
+<h3>📊&nbsp;Voting Thresholds</h3>
+<ul>
+<li>Different requirements for different decision types</li>
+<li>Quorum requirements for validity</li>
+<li>Emergency decision procedures</li>
+</ul>
 
-### Time Limits
-- Decision deadlines for timely action
-- Automatic delegation reversion
-- Escalation procedures for delays
+<h3>⏰&nbsp;Time Limits</h3>
+<ul>
+<li>Decision deadlines for timely action</li>
+<li>Automatic delegation reversion</li>
+<li>Escalation procedures for delays</li>
+</ul>
 
-### Appeal Mechanisms
-- Citizen-initiated review processes
-- Delegate accountability measures
-- Conflict resolution systems
+<h3>⚖️&nbsp;Appeal Mechanisms</h3>
+<ul>
+<li>Citizen-initiated review processes</li>
+<li>Delegate accountability measures</li>
+<li>Conflict resolution systems</li>
+</ul>
 
-## Modern Examples
+<h2>🌐&nbsp;Modern Examples</h2>
 
-### Democracy Earth
-- Blockchain-based liquid democracy
-- Global citizen participation
-- Decentralized governance
+<h3>🌍&nbsp;Democracy Earth</h3>
+<ul>
+<li>Blockchain-based liquid democracy</li>
+<li>Global citizen participation</li>
+<li>Decentralized governance</li>
+</ul>
 
-### Pirate Parties
-- Early adopters of liquid democracy
-- Internal party governance
-- Policy development processes
+<h3>🏴‍☠️&nbsp;Pirate Parties</h3>
+<ul>
+<li>Early adopters of liquid democracy</li>
+<li>Internal party governance</li>
+<li>Policy development processes</li>
+</ul>
 
-### Corporate Governance
-- Employee participation systems
-- Flexible decision-making
-- Merit-based authority
+<h3>🏢&nbsp;Corporate Governance</h3>
+<ul>
+<li>Employee participation systems</li>
+<li>Flexible decision-making</li>
+<li>Merit-based authority</li>
+</ul>
 
-## Best Practices
+<h2>💡&nbsp;Best Practices</h2>
 
-### User Experience
-- Simple and intuitive interfaces
-- Clear delegation options
-- Transparent information display
+<h3>👤&nbsp;User Experience</h3>
+<ul>
+<li>Simple and intuitive interfaces</li>
+<li>Clear delegation options</li>
+<li>Transparent information display</li>
+</ul>
 
-### Trust Building
-- Delegate background information
-- Voting history transparency
-- Performance metrics
+<h3>🤝&nbsp;Trust Building</h3>
+<ul>
+<li>Delegate background information</li>
+<li>Voting history transparency</li>
+<li>Performance metrics</li>
+</ul>
 
-### System Design
-- Robust technical infrastructure
-- Scalable architecture
-- Security and privacy protection
+<h3>🏗️&nbsp;System Design</h3>
+<ul>
+<li>Robust technical infrastructure</li>
+<li>Scalable architecture</li>
+<li>Security and privacy protection</li>
+</ul>
 
-## Case Studies
+<h2>📚&nbsp;Case Studies</h2>
 
-### German Pirate Party
-- Implemented liquid democracy internally
-- Influenced policy development
-- Demonstrated practical feasibility
+<h3>🇩🇪&nbsp;German Pirate Party</h3>
+<ul>
+<li>Implemented liquid democracy internally</li>
+<li>Influenced policy development</li>
+<li>Demonstrated practical feasibility</li>
+</ul>
 
-### Icelandic Constitutional Council
-- Used crowdsourcing and delegation
-- Constitutional reform process
-- Hybrid direct/representative approach
+<h3>🇮🇸&nbsp;Icelandic Constitutional Council</h3>
+<ul>
+<li>Used crowdsourcing and delegation</li>
+<li>Constitutional reform process</li>
+<li>Hybrid direct/representative approach</li>
+</ul>
 
-### DAO Governance
-- Decentralized autonomous organizations
-- Token-based voting and delegation
-- Real-world implementation examples
+<h3>⛓️&nbsp;DAO Governance</h3>
+<ul>
+<li>Decentralized autonomous organizations</li>
+<li>Token-based voting and delegation</li>
+<li>Real-world implementation examples</li>
+</ul>
 
-## Future Developments
+<h2>🚀&nbsp;Future Developments</h2>
 
-### AI-Assisted Delegation
-- Algorithmic delegate recommendations
-- Expertise matching systems
-- Automated decision support
+<h3>🤖&nbsp;AI-Assisted Delegation</h3>
+<ul>
+<li>Algorithmic delegate recommendations</li>
+<li>Expertise matching systems</li>
+<li>Automated decision support</li>
+</ul>
 
-### Predictive Governance
-- Outcome forecasting for decisions
-- Risk assessment tools
-- Impact analysis systems
+<h3>🔮&nbsp;Predictive Governance</h3>
+<ul>
+<li>Outcome forecasting for decisions</li>
+<li>Risk assessment tools</li>
+<li>Impact analysis systems</li>
+</ul>
 
-### Global Networks
-- Cross-organization delegation
-- International governance networks
-- Planetary-scale decision-making
+<h3>🌐&nbsp;Global Networks</h3>
+<ul>
+<li>Cross-organization delegation</li>
+<li>International governance networks</li>
+<li>Planetary-scale decision-making</li>
+</ul>
 
-## Conclusion
+<h2>🏁&nbsp;Conclusion</h2>
 
-Liquid democracy offers the most flexible and adaptive governance model, combining the benefits of direct participation with representative efficiency. Its success depends on thoughtful implementation and strong technical infrastructure.
+<p>Liquid democracy offers the most flexible and adaptive governance model, combining the benefits of direct participation with representative efficiency. Its success depends on thoughtful implementation and strong technical infrastructure.</p>
       `,
       completed: false
     },
@@ -686,202 +830,268 @@ Quadratic voting offers a mathematically optimal approach to fair decision-makin
       duration: "20 min",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder
       content: `
-# Futarchy
+<h1>🔮&nbsp;Futarchy</h1>
 
-## What is Futarchy?
+<h2>❓&nbsp;What is Futarchy?</h2>
 
-Futarchy is a governance system where decisions are made based on prediction markets. Instead of voting on policies directly, citizens bet on outcome metrics, and policies are adopted based on which ones prediction markets indicate will perform better.
+<p>Futarchy is a governance system where decisions are made based on prediction markets. Instead of voting on policies directly, citizens bet on outcome metrics, and policies are adopted based on which ones prediction markets indicate will perform better.</p>
 
-## Key Characteristics
+<h2>🔑&nbsp;Key Characteristics</h2>
 
-### 1. Prediction Markets
-- Markets for forecasting policy outcomes
-- Traders bet on future performance metrics
-- Market prices indicate expected results
+<h3>📈&nbsp;1. Prediction Markets</h3>
+<ul>
+<li>Markets for forecasting policy outcomes</li>
+<li>Traders bet on future performance metrics</li>
+<li>Market prices indicate expected results</li>
+</ul>
 
-### 2. Evidence-Based Decisions
-- Policies chosen based on predicted performance
-- Objective outcome measures
-- Market efficiency for information aggregation
+<h3>📊&nbsp;2. Evidence-Based Decisions</h3>
+<ul>
+<li>Policies chosen based on predicted performance</li>
+<li>Objective outcome measures</li>
+<li>Market efficiency for information aggregation</li>
+</ul>
 
-### 3. Incentive Alignment
-- Traders profit from accurate predictions
-- Strong incentives for information revelation
-- Market discipline on decision-making
+<h3>💰&nbsp;3. Incentive Alignment</h3>
+<ul>
+<li>Traders profit from accurate predictions</li>
+<li>Strong incentives for information revelation</li>
+<li>Market discipline on decision-making</li>
+</ul>
 
-## Advantages
+<h2>✅&nbsp;Advantages</h2>
 
-### Evidence-Based
-- Decisions based on predicted outcomes
-- Objective performance metrics
-- Reduced ideological bias
+<h3>🔬&nbsp;Evidence-Based</h3>
+<ul>
+<li>Decisions based on predicted outcomes</li>
+<li>Objective performance metrics</li>
+<li>Reduced ideological bias</li>
+</ul>
 
-### Information Efficiency
-- Markets aggregate dispersed knowledge
-- Traders incentivized to research thoroughly
-- Continuous information updating
+<h3>📡&nbsp;Information Efficiency</h3>
+<ul>
+<li>Markets aggregate dispersed knowledge</li>
+<li>Traders incentivized to research thoroughly</li>
+<li>Continuous information updating</li>
+</ul>
 
-### Accountability
-- Clear success/failure metrics
-- Transparent performance evaluation
-- Automatic course correction
+<h3>📋&nbsp;Accountability</h3>
+<ul>
+<li>Clear success/failure metrics</li>
+<li>Transparent performance evaluation</li>
+<li>Automatic course correction</li>
+</ul>
 
-## Challenges
+<h2>⚠️&nbsp;Challenges</h2>
 
-### Market Design
-- Difficult to create effective prediction markets
-- Complex outcome metric definition
-- Market manipulation risks
+<h3>🏗️&nbsp;Market Design</h3>
+<ul>
+<li>Difficult to create effective prediction markets</li>
+<li>Complex outcome metric definition</li>
+<li>Market manipulation risks</li>
+</ul>
 
-### Implementation Complexity
-- Requires sophisticated market infrastructure
-- High technical and operational costs
-- Complex for non-quantifiable decisions
+<h3>🛠️&nbsp;Implementation Complexity</h3>
+<ul>
+<li>Requires sophisticated market infrastructure</li>
+<li>High technical and operational costs</li>
+<li>Complex for non-quantifiable decisions</li>
+</ul>
 
-### Ethical Concerns
-- Markets may not capture all values
-- Potential for undesirable outcome metrics
-- Inequality in market participation
+<h3>🤔&nbsp;Ethical Concerns</h3>
+<ul>
+<li>Markets may not capture all values</li>
+<li>Potential for undesirable outcome metrics</li>
+<li>Inequality in market participation</li>
+</ul>
 
-## Implementation in Network States
+<h2>🛠️&nbsp;Implementation in Network States</h2>
 
-### Market Infrastructure
-- Decentralized prediction market platforms
-- Secure trading mechanisms
-- Transparent market operations
+<h3>🏪&nbsp;Market Infrastructure</h3>
+<ul>
+<li>Decentralized prediction market platforms</li>
+<li>Secure trading mechanisms</li>
+<li>Transparent market operations</li>
+</ul>
 
-### Outcome Metrics
-- Clearly defined success criteria
-- Measurable performance indicators
-- Regular metric evaluation
+<h3>📏&nbsp;Outcome Metrics</h3>
+<ul>
+<li>Clearly defined success criteria</li>
+<li>Measurable performance indicators</li>
+<li>Regular metric evaluation</li>
+</ul>
 
-### Decision Processes
-- Policy proposal submission
-- Market creation for proposals
-- Automatic policy adoption based on market results
+<h3>⚙️&nbsp;Decision Processes</h3>
+<ul>
+<li>Policy proposal submission</li>
+<li>Market creation for proposals</li>
+<li>Automatic policy adoption based on market results</li>
+</ul>
 
-## Prediction Market Mechanics
+<h2>📊&nbsp;Prediction Market Mechanics</h2>
 
-### Market Types
-- Binary outcome markets (yes/no)
-- Scalar markets (numeric ranges)
-- Multi-outcome markets (multiple options)
+<h3>🎯&nbsp;Market Types</h3>
+<ul>
+<li>Binary outcome markets (yes/no)</li>
+<li>Scalar markets (numeric ranges)</li>
+<li>Multi-outcome markets (multiple options)</li>
+</ul>
 
-### Trading Mechanisms
-- Automated market makers
-- Order book systems
-- Prediction market protocols
+<h3>🔄&nbsp;Trading Mechanisms</h3>
+<ul>
+<li>Automated market makers</li>
+<li>Order book systems</li>
+<li>Prediction market protocols</li>
+</ul>
 
-### Incentive Structures
-- Profit from accurate predictions
-- Loss from incorrect forecasts
-- Reputation systems for traders
+<h3>🏆&nbsp;Incentive Structures</h3>
+<ul>
+<li>Profit from accurate predictions</li>
+<li>Loss from incorrect forecasts</li>
+<li>Reputation systems for traders</li>
+</ul>
 
-## Decision-Making Framework
+<h2>📋&nbsp;Decision-Making Framework</h2>
 
-### Policy Proposal Phase
-- Citizens submit policy proposals
-- Clear outcome metrics defined
-- Initial feasibility assessment
+<h3>📝&nbsp;Policy Proposal Phase</h3>
+<ul>
+<li>Citizens submit policy proposals</li>
+<li>Clear outcome metrics defined</li>
+<li>Initial feasibility assessment</li>
+</ul>
 
-### Market Creation Phase
-- Prediction markets established
-- Trading period opens
-- Information gathering and analysis
+<h3>🏗️&nbsp;Market Creation Phase</h3>
+<ul>
+<li>Prediction markets established</li>
+<li>Trading period opens</li>
+<li>Information gathering and analysis</li>
+</ul>
 
-### Decision Phase
-- Markets close and results analyzed
-- Winning policies identified
-- Automatic implementation triggers
+<h3>🎯&nbsp;Decision Phase</h3>
+<ul>
+<li>Markets close and results analyzed</li>
+<li>Winning policies identified</li>
+<li>Automatic implementation triggers</li>
+</ul>
 
-## Practical Examples
+<h2>🌟&nbsp;Practical Examples</h2>
 
-### Economic Policy
-- Markets predict GDP growth under different policies
-- Tax policy based on predicted revenue
-- Monetary policy optimization
+<h3>💼&nbsp;Economic Policy</h3>
+<ul>
+<li>Markets predict GDP growth under different policies</li>
+<li>Tax policy based on predicted revenue</li>
+<li>Monetary policy optimization</li>
+</ul>
 
-### Environmental Policy
-- Markets forecast pollution reduction outcomes
-- Climate policy effectiveness prediction
-- Resource allocation optimization
+<h3>🌿&nbsp;Environmental Policy</h3>
+<ul>
+<li>Markets forecast pollution reduction outcomes</li>
+<li>Climate policy effectiveness prediction</li>
+<li>Resource allocation optimization</li>
+</ul>
 
-### Social Programs
-- Prediction markets for program effectiveness
-- Welfare policy outcome forecasting
-- Education policy evaluation
+<h3>👥&nbsp;Social Programs</h3>
+<ul>
+<li>Prediction markets for program effectiveness</li>
+<li>Welfare policy outcome forecasting</li>
+<li>Education policy evaluation</li>
+</ul>
 
-## Case Studies
+<h2>📚&nbsp;Case Studies</h2>
 
-### Robin Hanson Research
-- Original futarchy proposal development
-- Theoretical framework establishment
-- Academic foundation
+<h3>🔬&nbsp;Robin Hanson Research</h3>
+<ul>
+<li>Original futarchy proposal development</li>
+<li>Theoretical framework establishment</li>
+<li>Academic foundation</li>
+</ul>
 
-### Experimental Implementations
-- Small-scale futarchy experiments
-- Corporate decision-making applications
-- Research organization governance
+<h3>🧪&nbsp;Experimental Implementations</h3>
+<ul>
+<li>Small-scale futarchy experiments</li>
+<li>Corporate decision-making applications</li>
+<li>Research organization governance</li>
+</ul>
 
-### Modern Applications
-- Corporate prediction markets
-- Sports betting and forecasting
-- Political prediction platforms
+<h3>🌐&nbsp;Modern Applications</h3>
+<ul>
+<li>Corporate prediction markets</li>
+<li>Sports betting and forecasting</li>
+<li>Political prediction platforms</li>
+</ul>
 
-## Best Practices
+<h2>💡&nbsp;Best Practices</h2>
 
-### Market Design
-- Clear and unambiguous outcome metrics
-- Sufficient trading periods
-- Adequate liquidity provision
+<h3>🏗️&nbsp;Market Design</h3>
+<ul>
+<li>Clear and unambiguous outcome metrics</li>
+<li>Sufficient trading periods</li>
+<li>Adequate liquidity provision</li>
+</ul>
 
-### Governance Integration
-- Combination with other decision methods
-- Appeal mechanisms for market failures
-- Regular system evaluation
+<h3>🔗&nbsp;Governance Integration</h3>
+<ul>
+<li>Combination with other decision methods</li>
+<li>Appeal mechanisms for market failures</li>
+<li>Regular system evaluation</li>
+</ul>
 
-### Ethical Considerations
-- Inclusive market participation
-- Fair access to information
-- Protection of vulnerable groups
+<h3>🤝&nbsp;Ethical Considerations</h3>
+<ul>
+<li>Inclusive market participation</li>
+<li>Fair access to information</li>
+<li>Protection of vulnerable groups</li>
+</ul>
 
-## Technical Implementation
+<h2>💻&nbsp;Technical Implementation</h2>
 
-### Blockchain Integration
-- Decentralized market platforms
-- Smart contract automation
-- Transparent transaction records
+<h3>⛓️&nbsp;Blockchain Integration</h3>
+<ul>
+<li>Decentralized market platforms</li>
+<li>Smart contract automation</li>
+<li>Transparent transaction records</li>
+</ul>
 
-### Market Infrastructure
-- Automated market makers
-- Oracle systems for outcome reporting
-- Dispute resolution mechanisms
+<h3>🏪&nbsp;Market Infrastructure</h3>
+<ul>
+<li>Automated market makers</li>
+<li>Oracle systems for outcome reporting</li>
+<li>Dispute resolution mechanisms</li>
+</ul>
 
-### User Interfaces
-- Intuitive trading interfaces
-- Real-time market data
-- Educational resources for participants
+<h3>🎨&nbsp;User Interfaces</h3>
+<ul>
+<li>Intuitive trading interfaces</li>
+<li>Real-time market data</li>
+<li>Educational resources for participants</li>
+</ul>
 
-## Future Developments
+<h2>🚀&nbsp;Future Developments</h2>
 
-### Advanced Market Types
-- Conditional prediction markets
-- Multi-dimensional outcome spaces
-- Complex policy evaluation
+<h3>🔬&nbsp;Advanced Market Types</h3>
+<ul>
+<li>Conditional prediction markets</li>
+<li>Multi-dimensional outcome spaces</li>
+<li>Complex policy evaluation</li>
+</ul>
 
-### AI Integration
-- AI-assisted market analysis
-- Automated trading strategies
-- Predictive modeling enhancement
+<h3>🤖&nbsp;AI Integration</h3>
+<ul>
+<li>AI-assisted market analysis</li>
+<li>Automated trading strategies</li>
+<li>Predictive modeling enhancement</li>
+</ul>
 
-### Hybrid Systems
-- Futarchy combined with direct democracy
-- Representative systems with market elements
-- Multi-method governance frameworks
+<h3>🔀&nbsp;Hybrid Systems</h3>
+<ul>
+<li>Futarchy combined with direct democracy</li>
+<li>Representative systems with market elements</li>
+<li>Multi-method governance frameworks</li>
+</ul>
 
-## Conclusion
+<h2>🏁&nbsp;Conclusion</h2>
 
-Futarchy offers a revolutionary approach to evidence-based governance through prediction markets, but requires sophisticated implementation and careful ethical consideration. When properly designed, it can significantly improve decision quality and policy effectiveness.
+<p>Futarchy offers a revolutionary approach to evidence-based governance through prediction markets, but requires sophisticated implementation and careful ethical consideration. When properly designed, it can significantly improve decision quality and policy effectiveness.</p>
       `,
       completed: false
     }

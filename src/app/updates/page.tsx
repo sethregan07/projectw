@@ -21,6 +21,39 @@ interface Release {
 export default function UpdatesPage() {
   const releases: Release[] = [
     {
+      version: "v1.3.1",
+      date: "January 2026",
+      title: "Newsletter & Proposals Integration",
+      description: "Added comprehensive newsletter subscription system and proposals management features with enhanced backend services",
+      updates: [
+        {
+          type: "feature",
+          title: "Newsletter Subscription System",
+          description: "Complete newsletter subscription with email verification, welcome flows, and subscription management"
+        },
+        {
+          type: "feature",
+          title: "Proposals API and Dashboard",
+          description: "New proposals management system with API endpoints and dashboard integration for governance"
+        },
+        {
+          type: "improvement",
+          title: "Enhanced Learn Courses",
+          description: "Updated governance and getting-started courses with improved content and user experience"
+        },
+        {
+          type: "improvement",
+          title: "Backend Microservices Updates",
+          description: "Enhanced API gateway, auth service, and database configurations for better performance"
+        },
+        {
+          type: "improvement",
+          title: "Deployment and Infrastructure",
+          description: "Updated deployment scripts, Docker configurations, and VPS setup tools"
+        }
+      ]
+    },
+    {
       version: "v1.3.0",
       date: "November 2025",
       title: "Community & Collaboration Enhancement",
@@ -190,7 +223,7 @@ export default function UpdatesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="/features/community">
                 <Badge variant="secondary" className="px-4 py-2 cursor-pointer hover:bg-white/20">
-                  🆕 Latest: Community & Collaboration v1.3.0
+                  🆕 Latest: Newsletter & Proposals v1.3.1
                 </Badge>
               </Link>
             </div>

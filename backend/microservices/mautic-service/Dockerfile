@@ -1,12 +1,9 @@
-FROM php:8.1-alpine
+FROM node:18-alpine
 
 WORKDIR /app
 
 # Install dependencies
-RUN apk add --no-cache \
-    bash \
-    nodejs \
-    npm
+RUN apk add --no-cache bash
 
 # Copy package files
 COPY package*.json ./
@@ -16,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Expose port
-EXPOSE 80
+EXPOSE 8000
 
 # Start command
 CMD ["npm", "start"]

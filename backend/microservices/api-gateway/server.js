@@ -34,7 +34,7 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 // Service URLs
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://auth-service:3001';
 const GHOST_SERVICE_URL = process.env.GHOST_SERVICE_URL || 'http://ghost-service:2368';
-const MAUTIC_SERVICE_URL = process.env.MAUTIC_SERVICE_URL || 'http://mautic-service:8000';
+const MAILERLITE_SERVICE_URL = process.env.MAILERLITE_SERVICE_URL || 'http://mailerlite-service:8000';
 
 // Middleware
 app.use(cors());
@@ -96,9 +96,9 @@ const ghostServiceBreaker = new CircuitBreaker(
   circuitOptions
 );
 
-const mauticServiceBreaker = new CircuitBreaker(
+const mailerliteServiceBreaker = new CircuitBreaker(
   async (path, options) => {
-    return await axios(`${MAUTIC_SERVICE_URL}${path}`, options);
+    return await axios(`${MAILERLITE_SERVICE_URL}${path}`, options);
   },
   circuitOptions
 );
@@ -109,7 +109,7 @@ const proxyOptions = {
   pathRewrite: {
     '^/api/auth': '/api/auth',
     '^/api/ghost': '',
-    '^/api/mautic': ''
+    '^/api/mailerlite': ''
   }
 };
 
@@ -166,10 +166,10 @@ app.use('/api/newsletter', (req, res, next) => {
   });
 });
 
-// Mautic routes (require authentication)
-app.use('/api/mautic', authenticateToken, createProxyMiddleware({
+// MailerLite routes (require authentication)
+app.use('/api/mailerlite', authenticateToken, createProxyMiddleware({
   ...proxyOptions,
-  target: MAUTIC_SERVICE_URL,
+  target: MAILERLITE_SERVICE_URL,
   onProxyReq: (proxyReq, req, res) => {
     proxyReq.setHeader('X-Forwarded-For', req.ip);
   }
@@ -185,17 +185,17 @@ app.get('/api/services/health', async (req, res) => {
     }
     
     // Check health of all services
-    const [authHealth, ghostHealth, mauticHealth] = await Promise.allSettled([
+    const [authHealth, ghostHealth, mailerliteHealth] = await Promise.allSettled([
       authServiceBreaker.fire('/health', { method: 'GET' }),
       ghostServiceBreaker.fire('/ghost/api/v3/admin/site/', { method: 'GET' }),
-      mauticServiceBreaker.fire('/api/health', { method: 'GET' })
+      mailerliteServiceBreaker.fire('/api/health', { method: 'GET' })
     ]);
-    
+
     const health = {
       gateway: { status: 'ok' },
       auth: { status: authHealth.status === 'fulfilled' ? 'ok' : 'error' },
       ghost: { status: ghostHealth.status === 'fulfilled' ? 'ok' : 'error' },
-      mautic: { status: mauticHealth.status === 'fulfilled' ? 'ok' : 'error' }
+      mailerlite: { status: mailerliteHealth.status === 'fulfilled' ? 'ok' : 'error' }
     };
     
     // Cache the result
@@ -220,26 +220,26 @@ app.get('/api/user/profile', authenticateToken, async (req, res) => {
     });
     
     // Get user activity from other services
-    const [ghostActivity, mauticActivity] = await Promise.allSettled([
+    const [ghostActivity, mailerliteActivity] = await Promise.allSettled([
       ghostServiceBreaker.fire(`/ghost/api/v3/admin/members/${req.user.email}`, {
         method: 'GET',
         headers: {
           'Authorization': req.headers.authorization
         }
       }),
-      mauticServiceBreaker.fire(`/api/contacts/email/${req.user.email}`, {
+      mailerliteServiceBreaker.fire(`/api/subscribers/email/${req.user.email}`, {
         method: 'GET',
         headers: {
           'Authorization': req.headers.authorization
         }
       })
     ]);
-    
+
     // Combine the data
     const profile = {
       ...authProfile.data,
       ghost: ghostActivity.status === 'fulfilled' ? ghostActivity.value.data : null,
-      mautic: mauticActivity.status === 'fulfilled' ? mauticActivity.value.data : null
+      mailerlite: mailerliteActivity.status === 'fulfilled' ? mailerliteActivity.value.data : null
     };
     
     res.json(profile);

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
+import { NewsletterSubscribe } from "@/components/newsletter-subscribe";
 
 
 export default function Home() {
@@ -227,16 +228,7 @@ export default function Home() {
           <p className="text-lg text-muted-foreground mb-8">
             Get the latest insights on sustainable technology delivered to your inbox
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              className="flex-1 px-6 py-4 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <Button className="px-8 py-4 h-16 bg-blue-600 hover:bg-blue-700 rounded-sm">
-              Subscribe
-            </Button>
-          </div>
+          <NewsletterSubscribe />
         </div>
       </section>
     </div>

@@ -23,6 +23,7 @@ const { ethers } = require('ethers');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
+const axios = require('axios');
 
 // Initialize Express app
 const app = express();
@@ -49,21 +50,24 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Database connection
-const pool = new Pool({
-  host: process.env.DB_HOST || 'database-service',
+const db = new Pool({
+  host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'auth',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
+  user: process.env.DB_USER || 'nandan',
+  password: process.env.DB_PASSWORD || '',
 });
 
 // JWT configuration
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '24h';
 
+// MailerLite service configuration
+const MAILERLITE_SERVICE_URL = process.env.MAILERLITE_SERVICE_URL || 'http://mailerlite-service:8000';
+
 // Connect to database and create tables if they don't exist
 async function initializeDatabase() {
-  const client = await pool.connect();
+  const client = await db.connect();
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -79,7 +83,7 @@ async function initializeDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-      
+
       CREATE TABLE IF NOT EXISTS refresh_tokens (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -87,7 +91,7 @@ async function initializeDatabase() {
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-      
+
       CREATE TABLE IF NOT EXISTS login_attempts (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL,
@@ -95,10 +99,44 @@ async function initializeDatabase() {
         success BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS proposals (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(500) NOT NULL,
+        description TEXT NOT NULL,
+        author_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        category VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'pending',
+        funding_requested DECIMAL(20,2),
+        voting_start TIMESTAMP,
+        voting_end TIMESTAMP,
+        quorum INTEGER DEFAULT 100,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS votes (
+        id SERIAL PRIMARY KEY,
+        proposal_id INTEGER REFERENCES proposals(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        vote VARCHAR(10) NOT NULL CHECK (vote IN ('for', 'against')),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(proposal_id, user_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS funding_pledges (
+        id SERIAL PRIMARY KEY,
+        proposal_id INTEGER REFERENCES proposals(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        amount DECIMAL(20,2) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(proposal_id, user_id)
+      );
     `);
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Error initializing database:', err);
+    throw err;
   } finally {
     client.release();
   }
@@ -154,7 +192,7 @@ app.post('/api/auth/register', async (req, res) => {
   
   try {
     // Check if user already exists
-    const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const userCheck = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (userCheck.rows.length > 0) {
       return res.status(409).json({ message: 'User with this email already exists' });
@@ -165,7 +203,7 @@ app.post('/api/auth/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     // Create new user
-    const result = await pool.query(
+    const result = await db.query(
       'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, role',
       [name, email, hashedPassword]
     );
@@ -177,13 +215,13 @@ app.post('/api/auth/register', async (req, res) => {
     const refreshToken = generateRefreshToken(user.id);
     
     // Store refresh token
-    await pool.query(
+    await db.query(
       'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
       [user.id, refreshToken.token, refreshToken.expiresAt]
     );
     
     // Log successful registration
-    await pool.query(
+    await db.query(
       'INSERT INTO login_attempts (email, ip_address, success) VALUES ($1, $2, $3)',
       [email, req.ip, true]
     );
@@ -214,11 +252,11 @@ app.post('/api/auth/login', async (req, res) => {
   
   try {
     // Get user by email
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (result.rows.length === 0) {
       // Log failed attempt
-      await pool.query(
+      await db.query(
         'INSERT INTO login_attempts (email, ip_address, success) VALUES ($1, $2, $3)',
         [email, req.ip, false]
       );
@@ -233,7 +271,7 @@ app.post('/api/auth/login', async (req, res) => {
     
     if (!passwordMatch) {
       // Log failed attempt
-      await pool.query(
+      await db.query(
         'INSERT INTO login_attempts (email, ip_address, success) VALUES ($1, $2, $3)',
         [email, req.ip, false]
       );
@@ -246,13 +284,13 @@ app.post('/api/auth/login', async (req, res) => {
     const refreshToken = generateRefreshToken(user.id);
     
     // Store refresh token
-    await pool.query(
+    await db.query(
       'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
       [user.id, refreshToken.token, refreshToken.expiresAt]
     );
     
     // Log successful login
-    await pool.query(
+    await db.query(
       'INSERT INTO login_attempts (email, ip_address, success) VALUES ($1, $2, $3)',
       [email, req.ip, true]
     );
@@ -283,7 +321,7 @@ app.post('/api/auth/refresh', async (req, res) => {
   
   try {
     // Find the refresh token
-    const tokenResult = await pool.query(
+    const tokenResult = await db.query(
       'SELECT * FROM refresh_tokens WHERE token = $1 AND expires_at > NOW()',
       [refreshToken]
     );
@@ -295,7 +333,7 @@ app.post('/api/auth/refresh', async (req, res) => {
     const tokenData = tokenResult.rows[0];
     
     // Get user
-    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [tokenData.user_id]);
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [tokenData.user_id]);
     
     if (userResult.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
@@ -308,10 +346,10 @@ app.post('/api/auth/refresh', async (req, res) => {
     const newRefreshToken = generateRefreshToken(user.id);
     
     // Delete old refresh token
-    await pool.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
+    await db.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
     
     // Store new refresh token
-    await pool.query(
+    await db.query(
       'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
       [user.id, newRefreshToken.token, newRefreshToken.expiresAt]
     );
@@ -333,7 +371,7 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
   
   try {
     // Delete refresh tokens for user
-    await pool.query('DELETE FROM refresh_tokens WHERE user_id = $1', [req.user.userId]);
+    await db.query('DELETE FROM refresh_tokens WHERE user_id = $1', [req.user.userId]);
     
     res.json({ message: 'Logged out successfully' });
   } catch (err) {
@@ -344,7 +382,7 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
 
 app.get('/api/users/profile', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await db.query(
       'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
       [req.user.userId]
     );
@@ -366,7 +404,7 @@ app.put('/api/users/profile', authenticateToken, async (req, res) => {
   try {
     // Check if email is already taken by another user
     if (email) {
-      const emailCheck = await pool.query(
+      const emailCheck = await db.query(
         'SELECT * FROM users WHERE email = $1 AND id != $2',
         [email, req.user.userId]
       );
@@ -401,7 +439,7 @@ app.put('/api/users/profile', authenticateToken, async (req, res) => {
     
     values.push(req.user.userId);
     
-    const result = await pool.query(
+    const result = await db.query(
       `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${valueIndex} RETURNING id, name, email, role`,
       values
     );
@@ -425,7 +463,7 @@ app.post('/api/users/change-password', authenticateToken, async (req, res) => {
   
   try {
     // Get user with password
-    const result = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
+    const result = await db.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
@@ -445,13 +483,13 @@ app.post('/api/users/change-password', authenticateToken, async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
     
     // Update password
-    await pool.query(
+    await db.query(
       'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
       [hashedPassword, req.user.userId]
     );
     
     // Invalidate all refresh tokens for security
-    await pool.query('DELETE FROM refresh_tokens WHERE user_id = $1', [req.user.userId]);
+    await db.query('DELETE FROM refresh_tokens WHERE user_id = $1', [req.user.userId]);
     
     res.json({ message: 'Password changed successfully' });
   } catch (err) {
@@ -507,12 +545,12 @@ app.post('/api/auth/web3/authenticate', async (req, res) => {
     }
 
     // Check if user exists with this wallet
-    let userResult = await pool.query('SELECT * FROM users WHERE LOWER(wallet_address) = LOWER($1)', [walletAddress]);
+    let userResult = await db.query('SELECT * FROM users WHERE LOWER(wallet_address) = LOWER($1)', [walletAddress]);
 
     let user;
     if (userResult.rows.length === 0) {
       // Create new user with wallet address
-      const result = await pool.query(
+      const result = await db.query(
         'INSERT INTO users (name, email, wallet_address, auth_provider, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
         [`Web3 User ${walletAddress.slice(0, 8)}`, `${walletAddress.toLowerCase()}@wallet.local`, walletAddress, 'web3', 'web3_auth']
       );
@@ -526,13 +564,13 @@ app.post('/api/auth/web3/authenticate', async (req, res) => {
     const refreshToken = generateRefreshToken(user.id);
 
     // Store refresh token
-    await pool.query(
+    await db.query(
       'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
       [user.id, refreshToken.token, refreshToken.expiresAt]
     );
 
     // Log successful authentication
-    await pool.query(
+    await db.query(
       'INSERT INTO login_attempts (email, ip_address, success) VALUES ($1, $2, $3)',
       [user.email, req.ip, true]
     );
@@ -572,24 +610,24 @@ passport.use(new GoogleStrategy({
   async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user exists with this Google ID
-      let userResult = await pool.query('SELECT * FROM users WHERE provider_id = $1 AND auth_provider = $2',
+      let userResult = await db.query('SELECT * FROM users WHERE provider_id = $1 AND auth_provider = $2',
                                         [profile.id, 'google']);
 
       let user;
       if (userResult.rows.length === 0) {
         // Check if email already exists
-        const emailCheck = await pool.query('SELECT * FROM users WHERE email = $1', [profile.emails[0].value]);
+        const emailCheck = await db.query('SELECT * FROM users WHERE email = $1', [profile.emails[0].value]);
 
         if (emailCheck.rows.length > 0) {
           user = emailCheck.rows[0];
           // Update with OAuth info
-          await pool.query(
+          await db.query(
             'UPDATE users SET provider_id = $1, auth_provider = $2 WHERE id = $3',
             [profile.id, 'google', user.id]
           );
         } else {
           // Create new user
-          const result = await pool.query(
+          const result = await db.query(
             'INSERT INTO users (name, email, auth_provider, provider_id, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [profile.displayName, profile.emails[0].value, 'google', profile.id, 'oauth_auth']
           );
@@ -616,7 +654,7 @@ passport.use(new GitHubStrategy({
   async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user exists with this GitHub ID
-      let userResult = await pool.query('SELECT * FROM users WHERE provider_id = $1 AND auth_provider = $2',
+      let userResult = await db.query('SELECT * FROM users WHERE provider_id = $1 AND auth_provider = $2',
                                         [profile.id, 'github']);
 
       let user;
@@ -624,18 +662,18 @@ passport.use(new GitHubStrategy({
         // Check if email already exists
         let email = profile.emails && profile.emails[0] ? profile.emails[0].value : `${profile.username}@github.local`;
 
-        const emailCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const emailCheck = await db.query('SELECT * FROM users WHERE email = $1', [email]);
 
         if (emailCheck.rows.length > 0) {
           user = emailCheck.rows[0];
           // Update with OAuth info
-          await pool.query(
+          await db.query(
             'UPDATE users SET provider_id = $1, auth_provider = $2 WHERE id = $3',
             [profile.id, 'github', user.id]
           );
         } else {
           // Create new user
-          const result = await pool.query(
+          const result = await db.query(
             'INSERT INTO users (name, email, auth_provider, provider_id, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [profile.displayName || profile.username, email, 'github', profile.id, 'oauth_auth']
           );
@@ -665,7 +703,7 @@ app.get('/api/auth/google/callback',
       const token = generateToken(req.user);
       const refreshToken = generateRefreshToken(req.user.id);
 
-      await pool.query(
+      await db.query(
         'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
         [req.user.id, refreshToken.token, refreshToken.expiresAt]
       );
@@ -690,7 +728,7 @@ app.get('/api/auth/github/callback',
       const token = generateToken(req.user);
       const refreshToken = generateRefreshToken(req.user.id);
 
-      await pool.query(
+      await db.query(
         'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
         [req.user.id, refreshToken.token, refreshToken.expiresAt]
       );
@@ -736,7 +774,7 @@ app.get('/api/auth/methods', (req, res) => {
 
 // Initialize newsletter database table
 async function initializeNewsletterTable() {
-  const client = await pool.connect();
+  const client = await db.connect();
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS newsletter_subscribers (
@@ -796,7 +834,7 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 
   try {
     // Check if email is already subscribed
-    const existingSubscriber = await pool.query(
+    const existingSubscriber = await db.query(
       'SELECT * FROM newsletter_subscribers WHERE email = $1',
       [email.toLowerCase()]
     );
@@ -814,7 +852,7 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
     // Create or update subscriber
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO newsletter_subscribers (email, verification_token, ip_address, user_agent)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (email)
@@ -827,16 +865,32 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 
     const subscriber = result.rows[0];
 
-    // TODO: Send verification email
-    // For now, just return success with verification URL
+    // Send verification email via Mautic
     const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/verify?token=${verificationToken}`;
 
-    console.log(`Newsletter subscription for ${email}: ${verificationUrl}`);
+    try {
+      await axios.post(`${MAILERLITE_SERVICE_URL}/api/newsletter/send-verification`, {
+        email: email.toLowerCase(),
+        verificationToken,
+        verificationUrl
+      });
 
-    res.status(201).json({
-      message: 'Subscription request received. Please check your email to verify your subscription.',
-      verificationUrl: process.env.NODE_ENV === 'development' ? verificationUrl : undefined
-    });
+      console.log(`Newsletter verification email sent to ${email}`);
+
+      res.status(201).json({
+        message: 'Subscription request received. Please check your email to verify your subscription.',
+        verificationUrl: process.env.NODE_ENV === 'development' ? verificationUrl : undefined
+      });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError.message);
+
+      // Still return success but log the error - don't fail the subscription
+      res.status(201).json({
+        message: 'Subscription request received. Please check your email to verify your subscription.',
+        verificationUrl: process.env.NODE_ENV === 'development' ? verificationUrl : undefined,
+        warning: 'Email delivery may be delayed'
+      });
+    }
   } catch (err) {
     console.error('Newsletter subscription error:', err);
     res.status(500).json({ message: 'Server error during subscription' });
@@ -853,7 +907,7 @@ app.get('/api/newsletter/verify/:token', async (req, res) => {
 
   try {
     // Find subscriber by token
-    const result = await pool.query(
+    const result = await db.query(
       'SELECT * FROM newsletter_subscribers WHERE verification_token = $1 AND subscription_status = $2',
       [token, 'pending']
     );
@@ -865,10 +919,21 @@ app.get('/api/newsletter/verify/:token', async (req, res) => {
     const subscriber = result.rows[0];
 
     // Update subscriber status
-    await pool.query(
+    await db.query(
       'UPDATE newsletter_subscribers SET subscription_status = $1, verified_at = CURRENT_TIMESTAMP, verification_token = NULL WHERE id = $2',
       ['active', subscriber.id]
     );
+
+    // Notify MailerLite of confirmed subscription
+    try {
+      await axios.post(`${MAILERLITE_SERVICE_URL}/api/newsletter/confirm-subscription`, {
+        email: subscriber.email
+      });
+      console.log(`Newsletter subscription confirmed in MailerLite for ${subscriber.email}`);
+    } catch (mailerliteError) {
+      console.error('Failed to update MailerLite subscription status:', mailerliteError.message);
+      // Don't fail the verification if MailerLite update fails
+    }
 
     // Redirect to welcome page
     const welcomeUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/welcome?email=${encodeURIComponent(subscriber.email)}`;
@@ -888,13 +953,24 @@ app.post('/api/newsletter/unsubscribe', async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
+    const result = await db.query(
       'UPDATE newsletter_subscribers SET subscription_status = $1, unsubscribed_at = CURRENT_TIMESTAMP WHERE email = $2 AND subscription_status = $3 RETURNING *',
       ['unsubscribed', email.toLowerCase(), 'active']
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Active subscription not found for this email' });
+    }
+
+    // Notify MailerLite of unsubscription
+    try {
+      await axios.post(`${MAILERLITE_SERVICE_URL}/api/newsletter/unsubscribe`, {
+        email: email.toLowerCase()
+      });
+      console.log(`Newsletter unsubscription processed in MailerLite for ${email}`);
+    } catch (mailerliteError) {
+      console.error('Failed to update MailerLite unsubscription status:', mailerliteError.message);
+      // Don't fail the unsubscription if MailerLite update fails
     }
 
     res.json({ message: 'Successfully unsubscribed from newsletter' });
@@ -907,7 +983,7 @@ app.post('/api/newsletter/unsubscribe', async (req, res) => {
 // Get newsletter subscriber status (for authenticated users)
 app.get('/api/newsletter/status', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await db.query(
       'SELECT email, subscription_status, subscribed_at, verified_at FROM newsletter_subscribers WHERE email = $1',
       [req.user.email]
     );
@@ -926,6 +1002,233 @@ app.get('/api/newsletter/status', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Newsletter status error:', err);
     res.status(500).json({ message: 'Server error fetching subscription status' });
+  }
+});
+
+// Sync newsletter subscribers to Mautic (admin endpoint)
+app.post('/api/newsletter/sync-to-mautic', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin (you might want to add role checking)
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    // Fetch all newsletter subscribers
+    const result = await db.query(
+      'SELECT email, subscription_status, subscribed_at, verified_at FROM newsletter_subscribers ORDER BY created_at DESC'
+    );
+
+    const subscribers = result.rows;
+
+    // Send to MailerLite service
+    const syncResponse = await axios.post(`${MAILERLITE_SERVICE_URL}/api/newsletter/sync-subscribers`, {
+      subscribers
+    });
+
+    res.json({
+      message: 'Newsletter subscribers synced to MailerLite',
+      totalSubscribers: subscribers.length,
+      syncResult: syncResponse.data
+    });
+  } catch (err) {
+    console.error('Newsletter sync error:', err);
+    res.status(500).json({ message: 'Server error syncing subscribers to MailerLite' });
+  }
+});
+
+/**
+ * Governance API Endpoints
+ */
+
+// Get all proposals
+app.get('/api/proposals', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT
+        p.*,
+        u.name as author_name,
+        u.email as author_email,
+        COALESCE(votes_for.count, 0) as votes_for,
+        COALESCE(votes_against.count, 0) as votes_against,
+        COALESCE(votes_for.count, 0) + COALESCE(votes_against.count, 0) as total_votes
+      FROM proposals p
+      JOIN users u ON p.author_id = u.id
+      LEFT JOIN (
+        SELECT proposal_id, COUNT(*) as count
+        FROM votes
+        WHERE vote = 'for'
+        GROUP BY proposal_id
+      ) votes_for ON p.id = votes_for.proposal_id
+      LEFT JOIN (
+        SELECT proposal_id, COUNT(*) as count
+        FROM votes
+        WHERE vote = 'against'
+        GROUP BY proposal_id
+      ) votes_against ON p.id = votes_against.proposal_id
+      ORDER BY p.created_at DESC
+    `);
+
+    const proposals = result.rows.map(proposal => ({
+      id: proposal.id,
+      title: proposal.title,
+      description: proposal.description,
+      author: proposal.author_name,
+      category: proposal.category,
+      status: proposal.status,
+      votesFor: parseInt(proposal.votes_for),
+      votesAgainst: parseInt(proposal.votes_against),
+      totalVotes: parseInt(proposal.total_votes),
+      quorum: proposal.quorum,
+      fundingRequested: proposal.funding_requested ? `${proposal.funding_requested} LLD` : 'N/A',
+      created: proposal.created_at.toISOString().split('T')[0],
+      votingStart: proposal.voting_start,
+      votingEnd: proposal.voting_end
+    }));
+
+    res.json(proposals);
+  } catch (err) {
+    console.error('Error fetching proposals:', err);
+    res.status(500).json({ message: 'Server error fetching proposals' });
+  }
+});
+
+// Create a new proposal
+app.post('/api/proposals', authenticateToken, async (req, res) => {
+  const { title, description, category, fundingRequested, quorum } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: 'Title and description are required' });
+  }
+
+  try {
+    const result = await db.query(
+      `INSERT INTO proposals (title, description, author_id, category, funding_requested, quorum)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [title, description, req.user.userId, category, fundingRequested, quorum || 100]
+    );
+
+    const proposal = result.rows[0];
+    res.status(201).json({
+      message: 'Proposal created successfully',
+      proposal: {
+        id: proposal.id,
+        title: proposal.title,
+        description: proposal.description,
+        category: proposal.category,
+        status: proposal.status,
+        fundingRequested: proposal.funding_requested,
+        quorum: proposal.quorum,
+        created: proposal.created_at
+      }
+    });
+  } catch (err) {
+    console.error('Error creating proposal:', err);
+    res.status(500).json({ message: 'Server error creating proposal' });
+  }
+});
+
+// Get a specific proposal
+app.get('/api/proposals/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await db.query(`
+      SELECT
+        p.*,
+        u.name as author_name,
+        u.email as author_email,
+        COALESCE(votes_for.count, 0) as votes_for,
+        COALESCE(votes_against.count, 0) as votes_against,
+        COALESCE(votes_for.count, 0) + COALESCE(votes_against.count, 0) as total_votes
+      FROM proposals p
+      JOIN users u ON p.author_id = u.id
+      LEFT JOIN (
+        SELECT proposal_id, COUNT(*) as count
+        FROM votes
+        WHERE vote = 'for'
+        GROUP BY proposal_id
+      ) votes_for ON p.id = votes_for.proposal_id
+      LEFT JOIN (
+        SELECT proposal_id, COUNT(*) as count
+        FROM votes
+        WHERE vote = 'against'
+        GROUP BY proposal_id
+      ) votes_against ON p.id = votes_against.proposal_id
+      WHERE p.id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
+
+    const proposal = result.rows[0];
+    res.json({
+      id: proposal.id,
+      title: proposal.title,
+      description: proposal.description,
+      author: proposal.author_name,
+      category: proposal.category,
+      status: proposal.status,
+      votesFor: parseInt(proposal.votes_for),
+      votesAgainst: parseInt(proposal.votes_against),
+      totalVotes: parseInt(proposal.total_votes),
+      quorum: proposal.quorum,
+      fundingRequested: proposal.funding_requested ? `${proposal.funding_requested} LLD` : 'N/A',
+      created: proposal.created_at.toISOString().split('T')[0],
+      votingStart: proposal.voting_start,
+      votingEnd: proposal.voting_end
+    });
+  } catch (err) {
+    console.error('Error fetching proposal:', err);
+    res.status(500).json({ message: 'Server error fetching proposal' });
+  }
+});
+
+// Vote on a proposal
+app.post('/api/proposals/:id/vote', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { vote } = req.body; // 'for' or 'against'
+
+  if (!vote || !['for', 'against'].includes(vote)) {
+    return res.status(400).json({ message: 'Vote must be either "for" or "against"' });
+  }
+
+  try {
+    // Check if proposal exists and is active
+    const proposalResult = await db.query('SELECT * FROM proposals WHERE id = $1', [id]);
+    if (proposalResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
+
+    const proposal = proposalResult.rows[0];
+    if (proposal.status !== 'active') {
+      return res.status(400).json({ message: 'Proposal is not currently active for voting' });
+    }
+
+    // Check if user already voted
+    const existingVote = await db.query(
+      'SELECT * FROM votes WHERE proposal_id = $1 AND user_id = $2',
+      [id, req.user.userId]
+    );
+
+    if (existingVote.rows.length > 0) {
+      // Update existing vote
+      await db.query(
+        'UPDATE votes SET vote = $1 WHERE proposal_id = $2 AND user_id = $3',
+        [vote, id, req.user.userId]
+      );
+      res.json({ message: 'Vote updated successfully' });
+    } else {
+      // Insert new vote
+      await db.query(
+        'INSERT INTO votes (proposal_id, user_id, vote) VALUES ($1, $2, $3)',
+        [id, req.user.userId, vote]
+      );
+      res.json({ message: 'Vote cast successfully' });
+    }
+  } catch (err) {
+    console.error('Error voting on proposal:', err);
+    res.status(500).json({ message: 'Server error casting vote' });
   }
 });
 

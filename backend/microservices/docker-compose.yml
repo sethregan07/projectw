@@ -39,7 +39,7 @@ services:
       - PORT=3000
       - AUTH_SERVICE_URL=http://auth-service:3001
       - GHOST_SERVICE_URL=http://ghost-service:2368
-      - MAUTIC_SERVICE_URL=http://mautic-service:8000
+      - MAILERLITE_SERVICE_URL=http://mailerlite-service:8000
     networks:
       - microservices-network
     depends_on:
@@ -72,6 +72,8 @@ services:
       - DB_PASSWORD=postgres
       - JWT_SECRET=${JWT_SECRET:-supersecretkey}
       - JWT_EXPIRY=24h
+      - MAILERLITE_SERVICE_URL=http://mailerlite-service:8000
+      - FRONTEND_URL=http://localhost:80
     networks:
       - microservices-network
     depends_on:
@@ -118,12 +120,36 @@ services:
         max_attempts: 3
         window: 120s
 
-  # Mautic Marketing Service
-  mautic-service:
+  # MailerLite Marketing Service
+  mailerlite-service:
     build:
       context: ./mautic-service
       dockerfile: Dockerfile
-    container_name: mautic-service
+    container_name: mailerlite-service
+    restart: unless-stopped
+    environment:
+      - MAILERLITE_API_KEY=${MAILERLITE_API_KEY}
+      - MAIL_FROM_NAME=Newsletter
+      - MAIL_FROM_ADDRESS=newsletter@example.com
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+
+  # Mautic Instance
+  mautic:
+    build:
+      context: ../mautic
+    container_name: mautic
     restart: unless-stopped
     environment:
       - MAUTIC_DB_HOST=database-service
@@ -133,23 +159,22 @@ services:
       - MAUTIC_DB_PASSWORD=postgres
       - MAUTIC_ADMIN_EMAIL=admin@example.com
       - MAUTIC_ADMIN_PASSWORD=mauticadmin
+      - MAUTIC_SECRET_KEY=mautic-secret-key
+      - MAIL_FROM_NAME=Newsletter
+      - MAIL_FROM_EMAIL=newsletter@example.com
     networks:
       - microservices-network
+      - mautic_network
     depends_on:
       - database-service
     volumes:
       - mautic-data:/var/www/html
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 1m
       timeout: 10s
       retries: 3
       start_period: 30s
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-        window: 120s
 
   # Database Service
   database-service:
@@ -274,6 +299,9 @@ networks:
   microservices-network:
     driver: bridge
     name: microservices-network
+  mautic_network:
+    driver: bridge
+    name: mautic_network
 
 volumes:
   database-data:
