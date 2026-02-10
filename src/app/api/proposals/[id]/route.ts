@@ -5,10 +5,11 @@ const BACKEND_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3
 // GET /api/proposals/[id] - Get a specific proposal
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/proposals/${params.id}`, {
+    const { id } = await params;
+    const response = await fetch(`${BACKEND_URL}/api/proposals/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

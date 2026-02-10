@@ -5,11 +5,12 @@ const BACKEND_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3
 // POST /api/proposals/[id]/vote - Vote on a proposal
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
     const authHeader = request.headers.get('authorization');
+    const { id } = await params;
 
     if (!authHeader) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function POST(
       );
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/proposals/${params.id}/vote`, {
+    const response = await fetch(`${BACKEND_URL}/api/proposals/${id}/vote`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

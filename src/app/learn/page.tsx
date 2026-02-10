@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TabsRoot, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { AccordionRoot, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import Link from "next/link"
 
 export default function LearnPage() {
@@ -65,10 +66,72 @@ export default function LearnPage() {
   ]
 
   const browseByTopic = [
-    { name: "Vision", count: 24, icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> },
-    { name: "Technology", count: 18, icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> },
-    { name: "Governance", count: 15, icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> },
-    { name: "Economics", count: 12, icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
+    {
+      name: "Vision",
+      count: 24,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>,
+      description: "Core principles and long-term goals for network states",
+      articles: [
+        { title: "The Network State Manifesto", slug: "the-network-state-manifesto" },
+        { title: "Vision 2030: Digital Sovereignty", slug: "vision-2030-digital-sovereignty" },
+        { title: "Building Tomorrow's Societies", slug: "building-tomorrows-societies" }
+      ]
+    },
+    {
+      name: "Technology",
+      count: 18,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+      description: "Technical foundations and digital infrastructure",
+      articles: [
+        { title: "Blockchain for Network States", slug: "blockchain-for-network-states" },
+        { title: "Decentralized Identity Systems", slug: "decentralized-identity-systems" },
+        { title: "Smart Contract Governance", slug: "smart-contract-governance" }
+      ]
+    },
+    {
+      name: "Governance",
+      count: 15,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
+      description: "Democratic processes and decision-making frameworks",
+      articles: [
+        { title: "Liquid Democracy Explained", slug: "liquid-democracy-explained" },
+        { title: "Quadratic Voting Systems", slug: "quadratic-voting-systems" },
+        { title: "DAO Governance Models", slug: "dao-governance-models" }
+      ]
+    },
+    {
+      name: "Economics",
+      count: 12,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      description: "Tokenomics, funding models, and economic systems",
+      articles: [
+        { title: "Token Engineering Fundamentals", slug: "token-engineering-fundamentals" },
+        { title: "Crowdfunding Network States", slug: "crowdfunding-network-states" },
+        { title: "Sustainable Economic Models", slug: "sustainable-economic-models" }
+      ]
+    },
+    {
+      name: "Society",
+      count: 12,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      description: "Social structures and community dynamics",
+      articles: [
+        { title: "Building Digital Communities", slug: "building-digital-communities" },
+        { title: "Social Capital in Network States", slug: "social-capital-in-network-states" },
+        { title: "Cultural Evolution Online", slug: "cultural-evolution-online" }
+      ]
+    },
+    {
+      name: "Spirituality",
+      count: 12,
+      icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      description: "Meaning, purpose, and human experience in digital age",
+      articles: [
+        { title: "Digital Enlightenment", slug: "digital-enlightenment" },
+        { title: "Consciousness and Technology", slug: "consciousness-and-technology" },
+        { title: "Finding Meaning in Network States", slug: "finding-meaning-in-network-states" }
+      ]
+    }
   ]
 
   const resources = [
@@ -209,39 +272,51 @@ export default function LearnPage() {
       <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-3">Browse by Topic</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-3">Deprogramming</h2>
             <p className="text-muted-foreground">
               Explore content organized by subject area
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <AccordionRoot collapsible className="space-y-4">
             {browseByTopic.map((topic, index) => (
-              <Card
-                key={index}
-                className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer"
-              >
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+              <AccordionItem key={index} value={`topic-${index}`} className="border border-border rounded-lg px-6">
+                <AccordionTrigger className="py-6 hover:no-underline">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-4">
                       <div className="text-primary">{topic.icon}</div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{topic.name}</h3>
+                      <div className="text-left">
+                        <h3 className="font-semibold text-foreground text-lg">{topic.name}</h3>
                         <p className="text-sm text-muted-foreground">{topic.count} resources</p>
                       </div>
                     </div>
-                    <svg
-                      className="w-5 h-5 text-muted-foreground"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
                   </div>
-                </CardContent>
-              </Card>
+                </AccordionTrigger>
+                <AccordionContent className="pb-6">
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">{topic.description}</p>
+                    <div>
+                      <h4 className="font-medium text-foreground mb-3">Featured Articles:</h4>
+                      <ul className="space-y-2">
+                        {topic.articles.map((article, articleIndex) => (
+                          <li key={articleIndex} className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <Link href={`/articles/${article.slug}`} className="text-sm hover:text-primary transition-colors">
+                              {article.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      View All {topic.name} Resources
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </AccordionRoot>
         </div>
       </section>
 
